@@ -117,11 +117,14 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
         print("data: \(data)")
-        switch UInt8(tag) {
-        case SocketTag.HandshakeVersion.rawValue:
+        guard let socketTag = SocketTag(rawValue: UInt8(tag)) else {
+            return
+        }
+        switch socketTag {
+        case .HandshakeVersion:
             try! self.readSOCKSVersion(data)
             break
-        case SocketTag.HandshakeNumberOfAuthenticationMethods.rawValue:
+        case .HandshakeNumberOfAuthenticationMethods:
             try! self.readNumberOfAuthenticationMethods(data)
             break
         default:
