@@ -143,6 +143,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         case InvalidAddressType
         case InvalidDomainLength
         case InvalidDomainName
+        case InvalidPort
     }
     
     private let clientSocket: GCDAsyncSocket
@@ -279,6 +280,17 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         clientSocket.readData(.RequestPort)
     }
     
+    private func readPort(data: NSData) throws {
+        guard data.length == SocketTag.RequestPort.dataLength() else {
+            throw SocketError.InvalidPort
+        }
+        
+        var port: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
+        data.getBytes(&port, length: data.length)
+        let targetPort = Int(port[0]) << 8 | Int(port[1])
+        print("target port: \(targetPort)")
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
@@ -308,6 +320,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
                 break
             case .RequestDomainName:
                 try self.readDomainName(data)
+                break
+            case .RequestPort:
+                try self.readPort(data)
                 break
             default:
                 break
