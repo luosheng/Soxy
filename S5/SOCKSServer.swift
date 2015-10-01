@@ -309,7 +309,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     // MARK: - Private methods
     
     private func beginHandshake() {
-        clientSocket.readData(.HandshakeVersion)
+        clientSocket.readDataWithTimeout(-1, tag: Phase.MethodSelection.rawValue)
     }
     
     private func readSOCKSVersion(data: NSData) throws {
@@ -452,6 +452,10 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         guard methodSelection.authenticationMethods.contains(.None) else {
             throw SocketError.SupportedAuthenticationMethodNotFound
         }
+        
+        let reply = MethodSelectionReply(method: .None)
+        clientSocket.writeData(reply.data, withTimeout: -1, tag: 0)
+        clientSocket.readDataWithTimeout(-1, tag: Phase.Request.rawValue)
     }
     
     // MARK: - GCDAsyncSocketDelegate
