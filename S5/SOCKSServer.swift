@@ -377,8 +377,16 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
-        print("data: \(data)")
+        print("data: \(data) tag: \(tag)")
         guard let socketTag = SocketTag(rawValue: UInt8(tag)) else {
+            if let targetSocket = targetSocket {
+                if sock == clientSocket {
+                    targetSocket.writeData(data, withTimeout: -1, tag: 0)
+                } else {
+                    clientSocket.writeData(data, withTimeout: -1, tag: 0)
+                }
+                sock.readDataWithTimeout(-1, tag: 0)
+            }
             return
         }
         do {
