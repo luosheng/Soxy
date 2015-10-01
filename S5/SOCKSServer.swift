@@ -67,6 +67,10 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         }
     }
     
+    enum SocketError: ErrorType {
+        case InvalidSOCKSVersion
+    }
+    
     private let clientSocket: GCDAsyncSocket
     
     init(socket: GCDAsyncSocket) {
@@ -86,11 +90,25 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         clientSocket.readData(.HandshakeVersion)
     }
     
+    private func readSOCKSVersion(data: NSData) throws {
+        if (data.length == SocketTag.HandshakeVersion.dataLength()) {
+            var version: UInt8 = 0
+            data.getBytes(&version, length: data.length)
+            if (version == UInt8(SocketTag.HandshakeVersion.rawValue)) {
+                clientSocket.readData(.HandshakeNumberOfAuthenticationMethods)
+                return
+            }
+        }
+        throw SocketError.InvalidSOCKSVersion
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
+        print("data: \(data)")
         switch tag {
         case SocketTag.HandshakeVersion.rawValue:
+            try! self.readSOCKSVersion(data)
             break
         default:
             break
