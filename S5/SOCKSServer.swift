@@ -31,7 +31,7 @@ class SOCKSServer: GCDAsyncSocketDelegate {
         }
     }
     
-    // MARK: GCDAsyncSocketDelegate
+    // MARK: - GCDAsyncSocketDelegate
     
     @objc func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
         let connection = SOCKSConnection(socket: newSocket)
@@ -39,7 +39,9 @@ class SOCKSServer: GCDAsyncSocketDelegate {
     }
 }
 
-struct SOCKSConnection {
+// MARK: -
+
+class SOCKSConnection: GCDAsyncSocketDelegate {
     
     enum SocketTag: Int {
         case
@@ -69,12 +71,34 @@ struct SOCKSConnection {
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
+        let queue = dispatch_queue_create("net.luosheng.SOCKSConnection.DelegateQueue", DISPATCH_QUEUE_SERIAL)
+        clientSocket.setDelegate(self, delegateQueue: queue)
+        self.beginHandshake()
     }
     
     func disconnect() {
         clientSocket.disconnect()
     }
+    
+    // MARK: - Private methods
+    
+    private func beginHandshake() {
+        clientSocket.readData(.HandshakeVersion)
+    }
+    
+    // MARK: - GCDAsyncSocketDelegate
+
+    @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
+        switch tag {
+        case SocketTag.HandshakeVersion.rawValue:
+            break
+        default:
+            break
+        }
+    }
 }
+
+// MARK: -
 
 extension GCDAsyncSocket {
     func readData(tag: SOCKSConnection.SocketTag) {
