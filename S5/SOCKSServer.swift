@@ -293,17 +293,14 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
             AddressTypeNotSupported
         }
         static var version: UInt8 = 0x05
-        var field: Field?
+        var field: Field
         static var reserved: UInt8 = 0x00
-        var addressType: AddressType?
-        var address: String?
-        var port: UInt16?
+        var addressType: AddressType
+        var address: String
+        var port: UInt16
         
-        var data: NSData? {
+        var data: NSData {
             get {
-                guard let field = field, addressType = addressType, port = port, address = address else {
-                    return nil
-                }
                 let data = NSMutableData()
                 data.appendBytes(&Reply.version, length: 1)
                 
@@ -348,7 +345,6 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     private var domainLength = 0
     private var targetHost: String?
     private var targetPort: UInt16?
-    private lazy var reply = Reply(field: nil, addressType: nil, address: nil, port: nil)
     private var targetSocket: GCDAsyncSocket?
     private let delegateQueue: dispatch_queue_t
     
@@ -461,8 +457,6 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
             clientSocket.readData(.RequestDomainNameLength)
             break
         }
-        
-        reply.addressType = addressType
     }
     
     private func readDomainLength(data: NSData) throws {
@@ -484,8 +478,6 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         }
         targetHost = domainName
         clientSocket.readData(.RequestPort)
-        
-        reply.address = domainName
     }
     
     private func readPort(data: NSData) throws {
@@ -496,11 +488,6 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         var port: UInt16 = 0
         data.getBytes(&port, length: data.length)
         targetPort = port.bigEndian
-        
-        reply.port = port
-        reply.field = .Succeed
-        
-        clientSocket.writeData(reply)
     }
     
     private func processMethodSelection(data: NSData) throws {
@@ -598,13 +585,5 @@ func ==(lhs: SOCKSConnection, rhs: SOCKSConnection) -> Bool {
 extension GCDAsyncSocket {
     func readData(tag: SOCKSConnection.SocketTag) {
         return self.readDataToLength(UInt(tag.dataLength()), withTimeout: -1, tag: Int(tag.rawValue))
-    }
-    
-    func writeData(reply: SOCKSConnection.Reply) {
-        guard let data = reply.data else {
-            return
-        }
-        let tag = reply.field == .Succeed ? SOCKSConnection.replyTag : 0
-        return self.writeData(data, withTimeout: -1, tag: tag)
     }
 }
