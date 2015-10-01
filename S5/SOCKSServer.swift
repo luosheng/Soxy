@@ -43,7 +43,7 @@ class SOCKSServer: GCDAsyncSocketDelegate {
 
 class SOCKSConnection: GCDAsyncSocketDelegate {
     
-    enum SocketTag: Int {
+    enum SocketTag: UInt8 {
         case
 /* 
 +----+----------+----------+
@@ -56,7 +56,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         HandshakeNumberOfAuthenticationMethods,
         HandshakeAuthenticationMethod
         
-        func dataLength() -> UInt {
+        func dataLength() -> Int {
             switch self {
                 case .HandshakeVersion,
                 .HandshakeNumberOfAuthenticationMethods:
@@ -94,7 +94,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         if (data.length == SocketTag.HandshakeVersion.dataLength()) {
             var version: UInt8 = 0
             data.getBytes(&version, length: data.length)
-            if (version == UInt8(SocketTag.HandshakeVersion.rawValue)) {
+            if (version == SocketTag.HandshakeVersion.rawValue) {
                 clientSocket.readData(.HandshakeNumberOfAuthenticationMethods)
                 return
             }
@@ -106,7 +106,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
         print("data: \(data)")
-        switch tag {
+        switch UInt8(tag) {
         case SocketTag.HandshakeVersion.rawValue:
             try! self.readSOCKSVersion(data)
             break
@@ -120,6 +120,6 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
 
 extension GCDAsyncSocket {
     func readData(tag: SOCKSConnection.SocketTag) {
-        return self.readDataToLength(tag.dataLength(), withTimeout: -1, tag: tag.rawValue)
+        return self.readDataToLength(UInt(tag.dataLength()), withTimeout: -1, tag: Int(tag.rawValue))
     }
 }
