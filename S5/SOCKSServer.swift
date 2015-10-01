@@ -218,6 +218,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     private var targetHost: String?
     private var targetPort: UInt16?
     private lazy var reply = Reply(field: nil, addressType: nil, address: nil, port: nil)
+    private var targetSocket: GCDAsyncSocket?
     private let delegateQueue: dispatch_queue_t
     
     init(socket: GCDAsyncSocket) {
@@ -412,6 +413,22 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         } catch {
             print(error)
             clientSocket.disconnect()
+        }
+    }
+    
+    @objc func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
+        if tag == SOCKSConnection.replyTag {
+            targetSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
+            guard let targetHost = targetHost, targetPort = targetPort else {
+                return
+            }
+            do {
+                try targetSocket?.connectToHost(targetHost, onPort: targetPort, withTimeout: -1)
+                clientSocket.readDataWithTimeout(-1, tag: 0)
+                targetSocket?.readDataWithTimeout(-1, tag: 0)
+            } catch {
+                clientSocket.disconnectAfterReadingAndWriting()
+            }
         }
     }
 }
