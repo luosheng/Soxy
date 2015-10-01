@@ -9,7 +9,15 @@
 import Foundation
 import CocoaAsyncSocket
 
-class SOCKSServer: GCDAsyncSocketDelegate {
+// MARK: -
+
+protocol SOCKSConnectionDelegate {
+    func connectionDidClose(connection: SOCKSConnection)
+}
+
+// MARK: -
+
+class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
     
     private let socket: GCDAsyncSocket
     private var connections: [SOCKSConnection]
@@ -36,6 +44,14 @@ class SOCKSServer: GCDAsyncSocketDelegate {
     @objc func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
         let connection = SOCKSConnection(socket: newSocket)
         connections.append(connection)
+    }
+    
+    // MARK SOCKSConnectionDelegate
+    
+    func connectionDidClose(connection: SOCKSConnection) {
+        if let index = connections.indexOf(connection) {
+            connections.removeAtIndex(index)
+        }
     }
 }
 
@@ -217,6 +233,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         }
     }
     
+    var delgate: SOCKSConnectionDelegate?
     private let clientSocket: GCDAsyncSocket
     private var numberOfAuthenticationMethods = 0
     private var requestCommand: RequestCommand = .Connect
@@ -383,6 +400,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     @objc func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
         clientSocket.disconnect()
         targetSocket?.disconnect()
+        delgate?.connectionDidClose(self)
     }
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
