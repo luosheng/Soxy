@@ -21,6 +21,16 @@ class SOCKSServer: GCDAsyncSocketDelegate {
         try socket.acceptOnPort(port)
     }
     
+    deinit {
+        self.disconnectAll()
+    }
+    
+    func disconnectAll() {
+        for connection in connections {
+            connection.disconnect()
+        }
+    }
+    
     // MARK: GCDAsyncSocketDelegate
     
     @objc func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
@@ -31,7 +41,13 @@ class SOCKSServer: GCDAsyncSocketDelegate {
 
 struct SOCKSConnection {
     
+    private let clientSocket: GCDAsyncSocket
+    
     init(socket: GCDAsyncSocket) {
-        
+        clientSocket = socket
+    }
+    
+    func disconnect() {
+        clientSocket.disconnect()
     }
 }
