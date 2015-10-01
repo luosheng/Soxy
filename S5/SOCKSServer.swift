@@ -158,74 +158,71 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     }
     
     private func readSOCKSVersion(data: NSData) throws {
-        if (data.length == SocketTag.HandshakeVersion.dataLength()) {
-            var version: UInt8 = 0
-            data.getBytes(&version, length: data.length)
-            if (version == SocketTag.HandshakeVersion.rawValue) {
-                clientSocket.readData(.HandshakeNumberOfAuthenticationMethods)
-                return
-            }
+        guard data.length == SocketTag.HandshakeVersion.dataLength() else {
+            throw SocketError.InvalidSOCKSVersion
         }
-        throw SocketError.InvalidSOCKSVersion
+        var version: UInt8 = 0
+        data.getBytes(&version, length: data.length)
+        
+        guard version == SocketTag.HandshakeVersion.rawValue else {
+            throw SocketError.InvalidSOCKSVersion
+        }
+        clientSocket.readData(.HandshakeNumberOfAuthenticationMethods)
     }
     
     private func readNumberOfAuthenticationMethods(data: NSData) throws {
-        if (data.length == SocketTag.HandshakeNumberOfAuthenticationMethods.dataLength()) {
-            data.getBytes(&numberOfAuthenticationMethods, length: data.length)
-            clientSocket.readDataToLength(UInt(numberOfAuthenticationMethods), withTimeout: -1, tag: Int(SocketTag.HandshakeAuthenticationMethod.rawValue))
-            return
+        guard (data.length == SocketTag.HandshakeNumberOfAuthenticationMethods.dataLength()) else {
+            throw SocketError.UnableToRetrieveNumberOfAuthenticationMethods
         }
-        throw SocketError.UnableToRetrieveNumberOfAuthenticationMethods
+        data.getBytes(&numberOfAuthenticationMethods, length: data.length)
+        clientSocket.readDataToLength(UInt(numberOfAuthenticationMethods), withTimeout: -1, tag: Int(SocketTag.HandshakeAuthenticationMethod.rawValue))
     }
     
     private func readAuthenticationMethods(data: NSData) throws {
-        var authMethods: [UInt8] = Array<UInt8>(count: numberOfAuthenticationMethods, repeatedValue: 0)
-        if (data.length == numberOfAuthenticationMethods) {
-            data.getBytes(&authMethods, length: numberOfAuthenticationMethods)
-            
-            let methodSupported = authMethods.contains(AuthenticationMethod.None.rawValue)
-            if (methodSupported) {
-                /*
-                +----+--------+
-                |VER | METHOD |
-                +----+--------+
-                | 1  |   1    |
-                +----+--------+
-                */
-                let methodSelectionBytes: [UInt8] = [SocketTag.HandshakeVersion.rawValue, AuthenticationMethod.None.rawValue];
-                let methodSelectionData = NSData(bytes: methodSelectionBytes, length: methodSelectionBytes.count)
-                clientSocket.writeData(methodSelectionData, withTimeout: -1, tag: 0)
-                clientSocket.readData(.RequestHeaderFragment)
-            } else {
-                throw SocketError.SupportedAuthenticationMethodNotFound
-            }
-        } else {
+        guard data.length == numberOfAuthenticationMethods else {
             throw SocketError.WrongNumberOfAuthenticationMethods
         }
+        var authMethods: [UInt8] = Array<UInt8>(count: numberOfAuthenticationMethods, repeatedValue: 0)
+        data.getBytes(&authMethods, length: numberOfAuthenticationMethods)
+        
+        guard authMethods.contains(AuthenticationMethod.None.rawValue) else {
+            throw SocketError.SupportedAuthenticationMethodNotFound
+        }
+        /*
+         +----+--------+
+         |VER | METHOD |
+         +----+--------+
+         | 1  |   1    |
+         +----+--------+
+        */
+        let methodSelectionBytes: [UInt8] = [SocketTag.HandshakeVersion.rawValue, AuthenticationMethod.None.rawValue];
+        let methodSelectionData = NSData(bytes: methodSelectionBytes, length: methodSelectionBytes.count)
+        clientSocket.writeData(methodSelectionData, withTimeout: -1, tag: 0)
+        clientSocket.readData(.RequestHeaderFragment)
     }
     
     private func readHeaderFragment(data: NSData) throws {
-        if (data.length == SocketTag.RequestHeaderFragment.dataLength()) {
-            var header: [UInt8] = Array<UInt8>(count: data.length, repeatedValue: 0)
-            data.getBytes(&header, length: data.length)
-            
-            let version = header[0]
-            if (version != SocketTag.HandshakeVersion.rawValue) {
-                throw SocketError.InvalidSOCKSVersion
-            }
-            
-            guard let cmd = RequestCommand(rawValue: header[1]) else {
-                throw SocketError.InvalidRequestCommand
-            }
-            requestCommand = cmd
-            
-            // Reserved
-            _ = header[2]
-            
-            clientSocket.readData(.RequestAddressType)
-        } else {
+        guard data.length == SocketTag.RequestHeaderFragment.dataLength() else {
             throw SocketError.InvalidHeaderFragment
         }
+        
+        var header: [UInt8] = Array<UInt8>(count: data.length, repeatedValue: 0)
+        data.getBytes(&header, length: data.length)
+        
+        let version = header[0]
+        if (version != SocketTag.HandshakeVersion.rawValue) {
+            throw SocketError.InvalidSOCKSVersion
+        }
+        
+        guard let cmd = RequestCommand(rawValue: header[1]) else {
+            throw SocketError.InvalidRequestCommand
+        }
+        requestCommand = cmd
+        
+        // Reserved
+        _ = header[2]
+        
+        clientSocket.readData(.RequestAddressType)
     }
     
     // MARK: - GCDAsyncSocketDelegate
