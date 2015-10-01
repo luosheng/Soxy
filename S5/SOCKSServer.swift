@@ -123,6 +123,12 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         }
     }
     
+    enum Phase: Int {
+        case
+        MethodSelection = 10,
+        Request
+    }
+    
 /*
  o  X'00' NO AUTHENTICATION REQUIRED
  o  X'01' GSSAPI
