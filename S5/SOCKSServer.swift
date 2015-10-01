@@ -434,6 +434,15 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         clientSocket.writeData(reply)
     }
     
+    private func processMethodSelection(data: NSData) throws {
+        var bytes: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
+        data.getBytes(&bytes, length: bytes.count)
+        let methodSelection = try MethodSelection(bytes: bytes)
+        guard methodSelection.authenticationMethods.contains(.None) else {
+            throw SocketError.SupportedAuthenticationMethodNotFound
+        }
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
     
     @objc func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
