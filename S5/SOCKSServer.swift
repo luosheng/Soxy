@@ -141,11 +141,13 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         case InvalidRequestCommand
         case InvalidHeaderFragment
         case InvalidAddressType
+        case InvalidDomainLength
     }
     
     private let clientSocket: GCDAsyncSocket
     private var numberOfAuthenticationMethods = 0
     private var requestCommand: RequestCommand = .Connect
+    private var domainLength = 0
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
@@ -257,6 +259,15 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         }
     }
     
+    private func readDomainLength(data: NSData) throws {
+        guard data.length == SocketTag.RequestDomainNameLength.dataLength() else {
+            throw SocketError.InvalidDomainLength
+        }
+        
+        data.getBytes(&domainLength, length: data.length)
+        clientSocket.readDataToLength(UInt(domainLength), withTimeout: -1, tag: Int(SocketTag.RequestDomainName.rawValue))
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
@@ -280,6 +291,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
                 break
             case .RequestAddressType:
                 try self.readAddressType(data)
+                break
+            case .RequestDomainNameLength:
+                try self.readDomainLength(data)
                 break
             default:
                 break
