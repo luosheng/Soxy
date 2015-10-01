@@ -87,8 +87,18 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         func dataLength() -> Int {
             switch self {
                 case .HandshakeVersion,
-                .HandshakeNumberOfAuthenticationMethods:
+                .HandshakeNumberOfAuthenticationMethods,
+                .RequestAddressType,
+                .RequestDomainNameLength:
                 return 1
+            case .RequestHeaderFragment:
+                return 3
+            case .RequestIPv4Address:
+                return 4
+            case .RequestIPv6Address:
+                return 16
+            case .RequestPort:
+                return 2
             default:
                 return 0
             }
@@ -175,6 +185,7 @@ o  X'FF' NO ACCEPTABLE METHODS
                 let methodSelectionBytes: [UInt8] = [SocketTag.HandshakeVersion.rawValue, AuthenticationMethod.None.rawValue];
                 let methodSelectionData = NSData(bytes: methodSelectionBytes, length: methodSelectionBytes.count)
                 clientSocket.writeData(methodSelectionData, withTimeout: -1, tag: 0)
+                clientSocket.readData(.RequestHeaderFragment)
             } else {
                 throw SocketError.SupportedAuthenticationMethodNotFound
             }
