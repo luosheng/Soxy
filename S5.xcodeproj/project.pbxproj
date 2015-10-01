@@ -10,7 +10,23 @@
 		B32200A01BBCAB23009829BD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B322009F1BBCAB23009829BD /* AppDelegate.swift */; };
 		B32200A21BBCAB23009829BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B32200A11BBCAB23009829BD /* Assets.xcassets */; };
 		B32200A51BBCAB23009829BD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B32200A31BBCAB23009829BD /* MainMenu.xib */; };
+		B32200AF1BBCAF06009829BD /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; };
+		B32200B01BBCAF06009829BD /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B32200B11BBCAF06009829BD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B32200B01BBCAF06009829BD /* CocoaAsyncSocket.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B322009C1BBCAB23009829BD /* S5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = S5.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -18,6 +34,7 @@
 		B32200A11BBCAB23009829BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B32200A41BBCAB23009829BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		B32200A61BBCAB23009829BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = Carthage/Build/Mac/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -25,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B32200AF1BBCAF06009829BD /* CocoaAsyncSocket.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -34,6 +52,7 @@
 		B32200931BBCAB23009829BD = {
 			isa = PBXGroup;
 			children = (
+				B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */,
 				B322009E1BBCAB23009829BD /* S5 */,
 				B322009D1BBCAB23009829BD /* Products */,
 			);
@@ -68,6 +87,7 @@
 				B32200981BBCAB23009829BD /* Sources */,
 				B32200991BBCAB23009829BD /* Frameworks */,
 				B322009A1BBCAB23009829BD /* Resources */,
+				B32200B11BBCAF06009829BD /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -230,6 +250,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = S5/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.S5";
@@ -242,6 +266,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = S5/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.S5";
