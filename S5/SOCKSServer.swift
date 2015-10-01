@@ -188,6 +188,12 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
                 
                 data.appendBytes(&Reply.reserved, length: 1)
                 
+                // If reply field is anything other than Succeed, just reply with
+                // VER, REP, RSV
+                guard field == .Succeed else {
+                    return data
+                }
+                
                 var addressTypeValue = addressType.rawValue
                 data.appendBytes(&addressTypeValue, length: 1)
                 
@@ -369,10 +375,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         reply.port = port
         reply.field = .Succeed
         
-        if let data = reply.data {
-            print(data)
-            clientSocket.writeData(data, withTimeout: -1, tag: SOCKSConnection.replyTag)
-        }
+        clientSocket.writeData(reply)
     }
     
     // MARK: - GCDAsyncSocketDelegate
@@ -452,5 +455,13 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
 extension GCDAsyncSocket {
     func readData(tag: SOCKSConnection.SocketTag) {
         return self.readDataToLength(UInt(tag.dataLength()), withTimeout: -1, tag: Int(tag.rawValue))
+    }
+    
+    func writeData(reply: SOCKSConnection.Reply) {
+        guard let data = reply.data else {
+            return
+        }
+        let tag = reply.field == .Succeed ? SOCKSConnection.replyTag : 0
+        return self.writeData(data, withTimeout: -1, tag: tag)
     }
 }
