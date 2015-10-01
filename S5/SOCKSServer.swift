@@ -230,6 +230,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     
     func disconnect() {
         clientSocket.disconnect()
+        targetSocket?.disconnect()
     }
     
     // MARK: - Private methods
@@ -375,6 +376,11 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     }
     
     // MARK: - GCDAsyncSocketDelegate
+    
+    @objc func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
+        clientSocket.disconnect()
+        targetSocket?.disconnect()
+    }
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
         guard let socketTag = SocketTag(rawValue: UInt8(tag)) else {
