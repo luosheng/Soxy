@@ -264,24 +264,29 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         guard let socketTag = SocketTag(rawValue: UInt8(tag)) else {
             return
         }
-        switch socketTag {
-        case .HandshakeVersion:
-            try! self.readSOCKSVersion(data)
-            break
-        case .HandshakeNumberOfAuthenticationMethods:
-            try! self.readNumberOfAuthenticationMethods(data)
-            break
-        case .HandshakeAuthenticationMethod:
-            try! self.readAuthenticationMethods(data)
-            break
-        case .RequestHeaderFragment:
-            try! self.readHeaderFragment(data)
-            break
-        case .RequestAddressType:
-            try! self.readAddressType(data)
-            break
-        default:
-            break
+        do {
+            switch socketTag {
+            case .HandshakeVersion:
+                try self.readSOCKSVersion(data)
+                break
+            case .HandshakeNumberOfAuthenticationMethods:
+                try self.readNumberOfAuthenticationMethods(data)
+                break
+            case .HandshakeAuthenticationMethod:
+                try self.readAuthenticationMethods(data)
+                break
+            case .RequestHeaderFragment:
+                try self.readHeaderFragment(data)
+                break
+            case .RequestAddressType:
+                try self.readAddressType(data)
+                break
+            default:
+                break
+            }
+        } catch {
+            print(error)
+            clientSocket.disconnect()
         }
     }
 }
