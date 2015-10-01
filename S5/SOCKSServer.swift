@@ -69,6 +69,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     
     enum SocketError: ErrorType {
         case InvalidSOCKSVersion
+        case UnableToRetrieveNumberOfAuthenticationMethods
     }
     
     private let clientSocket: GCDAsyncSocket
@@ -102,6 +103,16 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         throw SocketError.InvalidSOCKSVersion
     }
     
+    private func readNumberOfAuthenticationMethods(data: NSData) throws {
+        if (data.length == SocketTag.HandshakeNumberOfAuthenticationMethods.dataLength()) {
+            var numberOfAuthenticationMethods = 0
+            data.getBytes(&numberOfAuthenticationMethods, length: data.length)
+            clientSocket.readDataToLength(UInt(numberOfAuthenticationMethods), withTimeout: -1, tag: Int(SocketTag.HandshakeAuthenticationMethod.rawValue))
+            return
+        }
+        throw SocketError.UnableToRetrieveNumberOfAuthenticationMethods
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
@@ -109,6 +120,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         switch UInt8(tag) {
         case SocketTag.HandshakeVersion.rawValue:
             try! self.readSOCKSVersion(data)
+            break
+        case SocketTag.HandshakeNumberOfAuthenticationMethods.rawValue:
+            try! self.readNumberOfAuthenticationMethods(data)
             break
         default:
             break
