@@ -132,10 +132,13 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         case UnableToRetrieveNumberOfAuthenticationMethods
         case SupportedAuthenticationMethodNotFound
         case WrongNumberOfAuthenticationMethods
+        case InvalidRequestCommand
+        case InvalidHeaderFragment
     }
     
     private let clientSocket: GCDAsyncSocket
     private var numberOfAuthenticationMethods = 0
+    private var requestCommand: RequestCommand = .Connect
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
@@ -201,6 +204,30 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         }
     }
     
+    private func readHeaderFragment(data: NSData) throws {
+        if (data.length == SocketTag.RequestHeaderFragment.dataLength()) {
+            var header: [UInt8] = Array<UInt8>(count: data.length, repeatedValue: 0)
+            data.getBytes(&header, length: data.length)
+            
+            let version = header[0]
+            if (version != SocketTag.HandshakeVersion.rawValue) {
+                throw SocketError.InvalidSOCKSVersion
+            }
+            
+            guard let cmd = RequestCommand(rawValue: header[1]) else {
+                throw SocketError.InvalidRequestCommand
+            }
+            requestCommand = cmd
+            
+            // Reserved
+            _ = header[2]
+            
+            clientSocket.readData(.RequestAddressType)
+        } else {
+            throw SocketError.InvalidHeaderFragment
+        }
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
@@ -217,6 +244,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             break
         case .HandshakeAuthenticationMethod:
             try! self.readAuthenticationMethods(data)
+            break
+        case .RequestHeaderFragment:
+            try! self.readHeaderFragment(data)
             break
         default:
             break
