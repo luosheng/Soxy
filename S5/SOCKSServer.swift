@@ -216,11 +216,12 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     private var targetHost: String?
     private var targetPort: UInt16?
     private lazy var reply = Reply(field: nil, addressType: nil, address: nil, port: nil)
+    private let delegateQueue: dispatch_queue_t
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
-        let queue = dispatch_queue_create("net.luosheng.SOCKSConnection.DelegateQueue", DISPATCH_QUEUE_SERIAL)
-        clientSocket.setDelegate(self, delegateQueue: queue)
+        delegateQueue = dispatch_queue_create("net.luosheng.SOCKSConnection.DelegateQueue", DISPATCH_QUEUE_SERIAL)
+        clientSocket.setDelegate(self, delegateQueue: delegateQueue)
         self.beginHandshake()
     }
     
