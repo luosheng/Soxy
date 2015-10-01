@@ -67,12 +67,30 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         }
     }
     
+/*
+o  X'00' NO AUTHENTICATION REQUIRED
+o  X'01' GSSAPI
+o  X'02' USERNAME/PASSWORD
+o  X'03' to X'7F' IANA ASSIGNED
+o  X'80' to X'FE' RESERVED FOR PRIVATE METHODS
+o  X'FF' NO ACCEPTABLE METHODS
+*/
+    enum AuthenticationMethod: UInt8 {
+        case
+        None = 0x00,
+        GSSAPI,
+        UsernamePassword
+    }
+    
     enum SocketError: ErrorType {
         case InvalidSOCKSVersion
         case UnableToRetrieveNumberOfAuthenticationMethods
+        case SupportedAuthenticationMethodNotFound
+        case WrongNumberOfAuthenticationMethods
     }
     
     private let clientSocket: GCDAsyncSocket
+    private var numberOfAuthenticationMethods = 0
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
@@ -105,12 +123,36 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     
     private func readNumberOfAuthenticationMethods(data: NSData) throws {
         if (data.length == SocketTag.HandshakeNumberOfAuthenticationMethods.dataLength()) {
-            var numberOfAuthenticationMethods = 0
             data.getBytes(&numberOfAuthenticationMethods, length: data.length)
             clientSocket.readDataToLength(UInt(numberOfAuthenticationMethods), withTimeout: -1, tag: Int(SocketTag.HandshakeAuthenticationMethod.rawValue))
             return
         }
         throw SocketError.UnableToRetrieveNumberOfAuthenticationMethods
+    }
+    
+    private func readAuthenticationMethods(data: NSData) throws {
+        var authMethods: [UInt8] = Array<UInt8>(count: numberOfAuthenticationMethods, repeatedValue: 0)
+        if (data.length == numberOfAuthenticationMethods) {
+            data.getBytes(&authMethods, length: numberOfAuthenticationMethods)
+            
+            let methodSupported = authMethods.contains(AuthenticationMethod.None.rawValue)
+            if (methodSupported) {
+                /*
+                +----+--------+
+                |VER | METHOD |
+                +----+--------+
+                | 1  |   1    |
+                +----+--------+
+                */
+                let methodSelectionBytes: [UInt8] = [SocketTag.HandshakeVersion.rawValue, AuthenticationMethod.None.rawValue];
+                let methodSelectionData = NSData(bytes: methodSelectionBytes, length: methodSelectionBytes.count)
+                clientSocket.writeData(methodSelectionData, withTimeout: -1, tag: 0)
+            } else {
+                throw SocketError.SupportedAuthenticationMethodNotFound
+            }
+        } else {
+            throw SocketError.WrongNumberOfAuthenticationMethods
+        }
     }
     
     // MARK: - GCDAsyncSocketDelegate
@@ -126,6 +168,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             break
         case .HandshakeNumberOfAuthenticationMethods:
             try! self.readNumberOfAuthenticationMethods(data)
+            break
+        case .HandshakeAuthenticationMethod:
+            try! self.readAuthenticationMethods(data)
             break
         default:
             break
