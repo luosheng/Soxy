@@ -59,6 +59,7 @@ class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
 
 class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     
+    static let version: UInt8 = 5
     static let replyTag = 100
     
     enum SocketTag: UInt8 {
@@ -129,6 +130,37 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         Request
     }
     
+    struct MethodSelection {
+        let version: UInt8
+        let numberOfAuthenticationMethods: UInt8
+        let authenticationMethods: [AuthenticationMethod]
+        
+        init(bytes: [UInt8]) throws {
+            guard bytes.count >= 3 else {
+                throw SocketError.WrongNumberOfAuthenticationMethods
+            }
+            
+            version = bytes[0]
+            
+            guard version == SOCKSConnection.version else {
+                throw SocketError.InvalidSOCKSVersion
+            }
+            
+            numberOfAuthenticationMethods = bytes[1]
+            
+            guard bytes.count == 1 + 1 + Int(numberOfAuthenticationMethods) else {
+                throw SocketError.WrongNumberOfAuthenticationMethods
+            }
+            
+            authenticationMethods = try bytes[2...(bytes.count - 1)].map() {
+                guard let method = AuthenticationMethod(rawValue: $0) else {
+                    throw SocketError.NotSupportedAuthenticationMethod
+                }
+                return method
+            }
+        }
+    }
+    
 /*
  o  X'00' NO AUTHENTICATION REQUIRED
  o  X'01' GSSAPI
@@ -160,6 +192,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     enum SocketError: ErrorType {
         case InvalidSOCKSVersion
         case UnableToRetrieveNumberOfAuthenticationMethods
+        case NotSupportedAuthenticationMethod
         case SupportedAuthenticationMethodNotFound
         case WrongNumberOfAuthenticationMethods
         case InvalidRequestCommand
