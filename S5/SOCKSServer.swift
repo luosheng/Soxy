@@ -41,7 +41,7 @@ class SOCKSServer: GCDAsyncSocketDelegate {
 
 // MARK: -
 
-class SOCKSConnection: GCDAsyncSocketDelegate {
+class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     
     static let replyTag = 100
     
@@ -448,6 +448,10 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             }
         }
     }
+}
+
+func ==(lhs: SOCKSConnection, rhs: SOCKSConnection) -> Bool {
+    return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
 }
 
 // MARK: -
