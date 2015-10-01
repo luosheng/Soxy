@@ -161,6 +161,17 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         }
     }
     
+    struct MethodSelectionReply {
+        let method: AuthenticationMethod
+        
+        var data: NSData {
+            get {
+                var bytes:[UInt8] = [SOCKSConnection.version, method.rawValue]
+                return NSData(bytes: &bytes, length: bytes.count)
+            }
+        }
+    }
+    
 /*
  o  X'00' NO AUTHENTICATION REQUIRED
  o  X'01' GSSAPI
