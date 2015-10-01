@@ -65,14 +65,14 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
 
  o  VER    protocol version: X'05'
  o  CMD
- o  CONNECT X'01'
- o  BIND X'02'
- o  UDP ASSOCIATE X'03'
+    o  CONNECT X'01'
+    o  BIND X'02'
+    o  UDP ASSOCIATE X'03'
  o  RSV    RESERVED
  o  ATYP   address type of following address
- o  IP V4 address: X'01'
- o  DOMAINNAME: X'03'
- o  IP V6 address: X'04'
+    o  IP V4 address: X'01'
+    o  DOMAINNAME: X'03'
+    o  IP V6 address: X'04'
  o  DST.ADDR       desired destination address
  o  DST.PORT desired destination port in network octet order
 */
@@ -106,18 +106,25 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     }
     
 /*
-o  X'00' NO AUTHENTICATION REQUIRED
-o  X'01' GSSAPI
-o  X'02' USERNAME/PASSWORD
-o  X'03' to X'7F' IANA ASSIGNED
-o  X'80' to X'FE' RESERVED FOR PRIVATE METHODS
-o  X'FF' NO ACCEPTABLE METHODS
+ o  X'00' NO AUTHENTICATION REQUIRED
+ o  X'01' GSSAPI
+ o  X'02' USERNAME/PASSWORD
+ o  X'03' to X'7F' IANA ASSIGNED
+ o  X'80' to X'FE' RESERVED FOR PRIVATE METHODS
+ o  X'FF' NO ACCEPTABLE METHODS
 */
     enum AuthenticationMethod: UInt8 {
         case
         None = 0x00,
         GSSAPI,
         UsernamePassword
+    }
+    
+    enum RequestCommand: UInt8 {
+        case
+        Connect = 0x01,
+        Bind,
+        UDPAssociate
     }
     
     enum SocketError: ErrorType {
