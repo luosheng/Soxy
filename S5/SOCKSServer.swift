@@ -142,6 +142,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         case InvalidHeaderFragment
         case InvalidAddressType
         case InvalidDomainLength
+        case InvalidDomainName
     }
     
     private let clientSocket: GCDAsyncSocket
@@ -268,6 +269,16 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         clientSocket.readDataToLength(UInt(domainLength), withTimeout: -1, tag: Int(SocketTag.RequestDomainName.rawValue))
     }
     
+    private func readDomainName(data: NSData) throws {
+        guard data.length == domainLength else {
+            throw SocketError.InvalidDomainName
+        }
+        
+        let domainName = String(data: data, encoding: NSASCIIStringEncoding)
+        print(domainName)
+        clientSocket.readData(.RequestPort)
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
@@ -294,6 +305,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
                 break
             case .RequestDomainNameLength:
                 try self.readDomainLength(data)
+                break
+            case .RequestDomainName:
+                try self.readDomainName(data)
                 break
             default:
                 break
