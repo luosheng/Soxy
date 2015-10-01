@@ -172,6 +172,64 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         }
     }
     
+    struct Request {
+        enum Command: UInt8 {
+            case
+            Connect = 0x01,
+            Bind,
+            UDPAssociate
+        }
+        
+        let version: UInt8
+        let command: Command
+        let reserved: UInt8
+        let addressType: AddressType
+        let targetHost: String
+        let targetPort: UInt16
+        
+        init(data: NSData) throws {
+            var bytes = [UInt8](count: data.length, repeatedValue: 0)
+            data.getBytes(&bytes, length: bytes.count)
+            
+            var offset = 0
+            
+            version = bytes[offset++]
+            guard version == SOCKSConnection.version else {
+                throw SocketError.InvalidSOCKSVersion
+            }
+            
+            guard let cmd = Command(rawValue: bytes[offset++]) else {
+                throw SocketError.InvalidRequestCommand
+            }
+            command = cmd
+            
+            reserved = bytes[offset++]
+            
+            guard let atyp = AddressType(rawValue: bytes[offset++]) else {
+                throw SocketError.InvalidAddressType
+            }
+            addressType = atyp
+            
+            switch addressType {
+            case .DomainName:
+                let domainNameLength = bytes[offset++]
+                guard let domainName = String(bytes: bytes[offset...(offset + Int(domainNameLength))], encoding: NSASCIIStringEncoding) else {
+                    throw SocketError.InvalidDomainName
+                }
+                targetHost = domainName
+                offset += Int(domainNameLength)
+                break
+            default:
+                targetHost = ""
+                break
+            }
+            
+            var bindPort: UInt16 = 0
+            data.getBytes(&bindPort, range: NSRange(location: offset, length: 2))
+            targetPort = bindPort.bigEndian
+        }
+    }
+    
 /*
  o  X'00' NO AUTHENTICATION REQUIRED
  o  X'01' GSSAPI
