@@ -43,6 +43,8 @@ class SOCKSServer: GCDAsyncSocketDelegate {
 
 class SOCKSConnection: GCDAsyncSocketDelegate {
     
+    static let replyTag = 100
+    
     enum SocketTag: UInt8 {
         case
 /* 
@@ -367,7 +369,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         
         if let data = reply.data {
             print(data)
-            clientSocket.writeData(data, withTimeout: -1, tag: 0)
+            clientSocket.writeData(data, withTimeout: -1, tag: SOCKSConnection.replyTag)
         }
     }
     
