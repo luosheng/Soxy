@@ -150,6 +150,8 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
     private var numberOfAuthenticationMethods = 0
     private var requestCommand: RequestCommand = .Connect
     private var domainLength = 0
+    private var targetHost: String?
+    private var targetPort: UInt16?
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
@@ -275,8 +277,10 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             throw SocketError.InvalidDomainName
         }
         
-        let domainName = String(data: data, encoding: NSASCIIStringEncoding)
-        print(domainName)
+        guard let domainName = String(data: data, encoding: NSASCIIStringEncoding) else {
+            throw SocketError.InvalidDomainName
+        }
+        targetHost = domainName
         clientSocket.readData(.RequestPort)
     }
     
@@ -287,8 +291,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         
         var port: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
         data.getBytes(&port, length: data.length)
-        let targetPort = Int(port[0]) << 8 | Int(port[1])
-        print("target port: \(targetPort)")
+        targetPort = UInt16(port[0]) << 8 | UInt16(port[1])
     }
     
     // MARK: - GCDAsyncSocketDelegate
