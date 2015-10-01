@@ -41,6 +41,30 @@ class SOCKSServer: GCDAsyncSocketDelegate {
 
 struct SOCKSConnection {
     
+    enum SocketTag: Int {
+        case
+/* 
++----+----------+----------+
+|VER | NMETHODS | METHODS  |
++----+----------+----------+
+| 1  |    1     | 1 to 255 |
++----+----------+----------+ 
+*/
+        HandshakeVersion = 5,
+        HandshakeNumberOfAuthenticationMethods,
+        HandshakeAuthenticationMethod
+        
+        func dataLength() -> UInt {
+            switch self {
+                case .HandshakeVersion,
+                .HandshakeNumberOfAuthenticationMethods:
+                return 1
+            default:
+                return 0
+            }
+        }
+    }
+    
     private let clientSocket: GCDAsyncSocket
     
     init(socket: GCDAsyncSocket) {
