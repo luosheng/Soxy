@@ -347,6 +347,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     private var targetPort: UInt16?
     private var targetSocket: GCDAsyncSocket?
     private let delegateQueue: dispatch_queue_t
+    private var request: Request?
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
@@ -503,6 +504,14 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         clientSocket.readDataWithTimeout(-1, tag: Phase.Request.rawValue)
     }
     
+    private func processRequest(data: NSData) throws {
+        let request = try Request(data: data)
+        let reply = Reply(field: .Succeed, addressType: request.addressType, address: request.targetHost, port: request.targetPort)
+        self.request = request
+        clientSocket.writeData(reply.data, withTimeout: -1, tag: SOCKSConnection.replyTag)
+        clientSocket.readDataWithTimeout(-1, tag: 0)
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
     
     @objc func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
@@ -562,11 +571,11 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     @objc func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
         if tag == SOCKSConnection.replyTag {
             targetSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
-            guard let targetHost = targetHost, targetPort = targetPort else {
+            guard let request = request else {
                 return
             }
             do {
-                try targetSocket?.connectToHost(targetHost, onPort: targetPort, withTimeout: -1)
+                try targetSocket?.connectToHost(request.targetHost, onPort: request.targetPort, withTimeout: -1)
                 clientSocket.readDataWithTimeout(-1, tag: 0)
                 targetSocket?.readDataWithTimeout(-1, tag: 0)
             } catch {
