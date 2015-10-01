@@ -325,6 +325,8 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             clientSocket.readData(.RequestDomainNameLength)
             break
         }
+        
+        reply.addressType = addressType
     }
     
     private func readDomainLength(data: NSData) throws {
@@ -346,6 +348,8 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         }
         targetHost = domainName
         clientSocket.readData(.RequestPort)
+        
+        reply.address = domainName
     }
     
     private func readPort(data: NSData) throws {
@@ -356,6 +360,14 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         var port: UInt16 = 0
         data.getBytes(&port, length: data.length)
         targetPort = port.bigEndian
+        
+        reply.port = port
+        reply.field = .Succeed
+        
+        if let data = reply.data {
+            print(data)
+            clientSocket.writeData(data, withTimeout: -1, tag: 0)
+        }
     }
     
     // MARK: - GCDAsyncSocketDelegate
