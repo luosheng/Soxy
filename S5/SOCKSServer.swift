@@ -127,6 +127,12 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         UDPAssociate
     }
     
+    enum AddressType: UInt8 {
+        case IPv4 = 0x01
+        case IPv6 = 0x04
+        case DomainName = 0x03
+    }
+    
     enum SocketError: ErrorType {
         case InvalidSOCKSVersion
         case UnableToRetrieveNumberOfAuthenticationMethods
@@ -134,6 +140,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         case WrongNumberOfAuthenticationMethods
         case InvalidRequestCommand
         case InvalidHeaderFragment
+        case InvalidAddressType
     }
     
     private let clientSocket: GCDAsyncSocket
@@ -225,6 +232,31 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         clientSocket.readData(.RequestAddressType)
     }
     
+    private func readAddressType(data: NSData) throws {
+        guard data.length == SocketTag.RequestAddressType.dataLength() else {
+            throw SocketError.InvalidAddressType
+        }
+        
+        var addressTypeByte: UInt8 = 0
+        data.getBytes(&addressTypeByte, length: data.length)
+        
+        guard let addressType = AddressType(rawValue: addressTypeByte) else {
+            throw SocketError.InvalidAddressType
+        }
+        
+        switch addressType {
+        case .IPv4:
+            clientSocket.readData(.RequestIPv4Address)
+            break
+        case .IPv6:
+            clientSocket.readData(.RequestIPv6Address)
+            break
+        case .DomainName:
+            clientSocket.readData(.RequestDomainNameLength)
+            break
+        }
+    }
+    
     // MARK: - GCDAsyncSocketDelegate
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
@@ -244,6 +276,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             break
         case .RequestHeaderFragment:
             try! self.readHeaderFragment(data)
+            break
+        case .RequestAddressType:
+            try! self.readAddressType(data)
             break
         default:
             break
