@@ -75,3 +75,9 @@ struct SOCKSConnection {
         clientSocket.disconnect()
     }
 }
+
+extension GCDAsyncSocket {
+    func readData(tag: SOCKSConnection.SocketTag) {
+        return self.readDataToLength(tag.dataLength(), withTimeout: -1, tag: tag.rawValue)
+    }
+}
