@@ -80,7 +80,10 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         let numberOfAuthenticationMethods: UInt8
         let authenticationMethods: [AuthenticationMethod]
         
-        init(bytes: [UInt8]) throws {
+        init(data: NSData) throws {
+            var bytes: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
+            data.getBytes(&bytes, length: bytes.count)
+            
             guard bytes.count >= 3 else {
                 throw SocketError.WrongNumberOfAuthenticationMethods
             }
@@ -323,10 +326,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     // MARK: - Private methods
     
     private func processMethodSelection(data: NSData) throws {
-        var bytes: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
-        data.getBytes(&bytes, length: bytes.count)
-        
-        let methodSelection = try MethodSelection(bytes: bytes)
+        let methodSelection = try MethodSelection(data: data)
         guard methodSelection.authenticationMethods.contains(.None) else {
             throw SocketError.SupportedAuthenticationMethodNotFound
         }
