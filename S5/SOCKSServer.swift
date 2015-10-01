@@ -289,9 +289,9 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             throw SocketError.InvalidPort
         }
         
-        var port: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
+        var port: UInt16 = 0
         data.getBytes(&port, length: data.length)
-        targetPort = UInt16(port[0]) << 8 | UInt16(port[1])
+        targetPort = port.bigEndian
     }
     
     // MARK: - GCDAsyncSocketDelegate
