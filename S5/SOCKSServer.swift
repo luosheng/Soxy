@@ -354,14 +354,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
         do {
-            switch tag {
-            case Phase.MethodSelection.rawValue:
-                try self.processMethodSelection(data)
-                break
-            case Phase.Request.rawValue:
-                try self.processRequest(data)
-                break
-            default:
+            guard let phase = Phase(rawValue: tag) else {
                 // If the tag is not specified, it's in proxy mode
                 if sock == clientSocket {
                     targetSocket?.writeData(data, withTimeout: -1, tag: 0)
@@ -369,6 +362,14 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
                     clientSocket.writeData(data, withTimeout: -1, tag: 0)
                 }
                 sock.readDataWithTimeout(-1, tag: 0)
+                return
+            }
+            switch phase {
+            case .MethodSelection:
+                try self.processMethodSelection(data)
+                break
+            case .Request:
+                try self.processRequest(data)
                 break
             }
         } catch {
