@@ -166,12 +166,47 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
             CommandNotSupported,
             AddressTypeNotSupported
         }
-        static let version: UInt8 = 0x05
+        static var version: UInt8 = 0x05
         var field: Field?
-        static let reserved: UInt8 = 0x00
+        static var reserved: UInt8 = 0x00
         var addressType: AddressType?
         var address: String?
         var port: UInt16?
+        
+        var data: NSData? {
+            get {
+                guard let field = field, addressType = addressType, port = port, address = address else {
+                    return nil
+                }
+                let data = NSMutableData()
+                data.appendBytes(&Reply.version, length: 1)
+                
+                var fieldValue = field.rawValue
+                data.appendBytes(&fieldValue, length: 1)
+                
+                data.appendBytes(&Reply.reserved, length: 1)
+                
+                var addressTypeValue = addressType.rawValue
+                data.appendBytes(&addressTypeValue, length: 1)
+                
+                switch addressType {
+                case .DomainName:
+                    var domainLength: UInt8 = UInt8(address.characters.count)
+                    data.appendBytes(&domainLength, length: 1)
+                    
+                    var domainName = [UInt8](address.utf8)
+                    data.appendBytes(&domainName, length: address.characters.count)
+                    break
+                default:
+                    break
+                }
+                
+                var networkOctetOrderPort = port.littleEndian
+                data.appendBytes(&networkOctetOrderPort, length: 2)
+                
+                return data
+            }
+        }
     }
     
     private let clientSocket: GCDAsyncSocket
