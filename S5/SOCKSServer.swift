@@ -146,12 +146,41 @@ class SOCKSConnection: GCDAsyncSocketDelegate {
         case InvalidPort
     }
     
+    
+/*
+ +----+-----+-------+------+----------+----------+
+ |VER | REP |  RSV  | ATYP | BND.ADDR | BND.PORT |
+ +----+-----+-------+------+----------+----------+
+ | 1  |  1  | X'00' |  1   | Variable |    2     |
+ +----+-----+-------+------+----------+----------+
+*/
+    struct Reply {
+        enum Field: UInt8 {
+            case
+            Succeed = 0x00,
+            GeneralSOCKSServerFailure,
+            ConnectionNotAllowedByRuleset,
+            NetworkUnreachable,
+            ConnectionRefused,
+            TTLExpired,
+            CommandNotSupported,
+            AddressTypeNotSupported
+        }
+        static let version: UInt8 = 0x05
+        var field: Field?
+        static let reserved: UInt8 = 0x00
+        var addressType: AddressType?
+        var address: String?
+        var port: UInt16?
+    }
+    
     private let clientSocket: GCDAsyncSocket
     private var numberOfAuthenticationMethods = 0
     private var requestCommand: RequestCommand = .Connect
     private var domainLength = 0
     private var targetHost: String?
     private var targetPort: UInt16?
+    private lazy var reply = Reply(field: nil, addressType: nil, address: nil, port: nil)
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
