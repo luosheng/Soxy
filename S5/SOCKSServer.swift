@@ -494,6 +494,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     private func processMethodSelection(data: NSData) throws {
         var bytes: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
         data.getBytes(&bytes, length: bytes.count)
+        
         let methodSelection = try MethodSelection(bytes: bytes)
         guard methodSelection.authenticationMethods.contains(.None) else {
             throw SocketError.SupportedAuthenticationMethodNotFound
@@ -521,50 +522,28 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     }
 
     @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
-        guard let socketTag = SocketTag(rawValue: UInt8(tag)) else {
-            // If the tag is not specified, it's in proxy mode
-            if let targetSocket = targetSocket {
+        print("data: \(data)")
+        do {
+            switch tag {
+            case Phase.MethodSelection.rawValue:
+                try self.processMethodSelection(data)
+                break
+            case Phase.Request.rawValue:
+                try self.processRequest(data)
+                break
+            default:
+                // If the tag is not specified, it's in proxy mode
                 if sock == clientSocket {
-                    targetSocket.writeData(data, withTimeout: -1, tag: 0)
-                } else if sock == targetSocket {
+                    targetSocket?.writeData(data, withTimeout: -1, tag: 0)
+                } else {
                     clientSocket.writeData(data, withTimeout: -1, tag: 0)
                 }
                 sock.readDataWithTimeout(-1, tag: 0)
-            }
-            return
-        }
-        do {
-            switch socketTag {
-            case .HandshakeVersion:
-                try self.readSOCKSVersion(data)
-                break
-            case .HandshakeNumberOfAuthenticationMethods:
-                try self.readNumberOfAuthenticationMethods(data)
-                break
-            case .HandshakeAuthenticationMethod:
-                try self.readAuthenticationMethods(data)
-                break
-            case .RequestHeaderFragment:
-                try self.readHeaderFragment(data)
-                break
-            case .RequestAddressType:
-                try self.readAddressType(data)
-                break
-            case .RequestDomainNameLength:
-                try self.readDomainLength(data)
-                break
-            case .RequestDomainName:
-                try self.readDomainName(data)
-                break
-            case .RequestPort:
-                try self.readPort(data)
-                break
-            default:
                 break
             }
         } catch {
-            print(error)
-            clientSocket.disconnect()
+            print("error: \(error)")
+            self.disconnect()
         }
     }
     
