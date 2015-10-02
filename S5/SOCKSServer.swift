@@ -188,7 +188,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
             switch addressType {
             case .DomainName:
                 let domainNameLength = bytes[offset++]
-                guard let domainName = String(bytes: bytes[offset...(offset + Int(domainNameLength))], encoding: NSASCIIStringEncoding) else {
+                guard let domainName = String(bytes: bytes[offset..<(offset + Int(domainNameLength))], encoding: NSASCIIStringEncoding) else {
                     throw SocketError.InvalidDomainName
                 }
                 targetHost = domainName
