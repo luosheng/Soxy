@@ -335,8 +335,8 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
     }
     
     func disconnect() {
-        clientSocket.disconnect()
-        targetSocket?.disconnect()
+        clientSocket.disconnectAfterReadingAndWriting()
+        targetSocket?.disconnectAfterReadingAndWriting()
     }
     
     // MARK: - Private methods
@@ -363,8 +363,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
     // MARK: - GCDAsyncSocketDelegate
     
     @objc public func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
-        clientSocket.disconnect()
-        targetSocket?.disconnect()
+        self.disconnect()
         delgate?.connectionDidClose(self)
     }
 
