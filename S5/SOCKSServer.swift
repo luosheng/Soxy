@@ -20,10 +20,9 @@ protocol SOCKSConnectionDelegate {
 class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
     
     private let socket: GCDAsyncSocket
-    private var connections: [SOCKSConnection]
+    private var connections = Set<SOCKSConnection>()
     
     init(port: UInt16) throws {
-        connections = []
         socket = GCDAsyncSocket(delegate: nil, delegateQueue: dispatch_get_global_queue(0, 0))
         socket.delegate = self
         try socket.acceptOnPort(port)
@@ -43,15 +42,14 @@ class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
     
     @objc func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
         let connection = SOCKSConnection(socket: newSocket)
-        connections.append(connection)
+        connection.delgate = self
+        connections.insert(connection)
     }
     
     // MARK SOCKSConnectionDelegate
     
     func connectionDidClose(connection: SOCKSConnection) {
-        if let index = connections.indexOf(connection) {
-            connections.removeAtIndex(index)
-        }
+        connections.remove(connection)
     }
 }
 
