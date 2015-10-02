@@ -57,7 +57,7 @@ class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
 
 // MARK: -
 
-public class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
+public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
     
     static let version: UInt8 = 5
     static let replyTag = 100
@@ -310,6 +310,12 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     private let clientSocket: GCDAsyncSocket
     private var targetSocket: GCDAsyncSocket?
     private var request: Request?
+    
+    public var hashValue: Int {
+        get {
+            return ObjectIdentifier(self).hashValue
+        }
+    }
     
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
