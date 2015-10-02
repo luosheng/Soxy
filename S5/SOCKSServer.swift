@@ -57,7 +57,7 @@ class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
 
 // MARK: -
 
-class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
+public class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     
     static let version: UInt8 = 5
     static let replyTag = 100
@@ -346,13 +346,13 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     
     // MARK: - GCDAsyncSocketDelegate
     
-    @objc func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
+    @objc public func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
         clientSocket.disconnect()
         targetSocket?.disconnect()
         delgate?.connectionDidClose(self)
     }
 
-    @objc func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
+    @objc public func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
         do {
             guard let phase = Phase(rawValue: tag) else {
                 // If the tag is not specified, it's in proxy mode
@@ -378,7 +378,7 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
         }
     }
     
-    @objc func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
+    @objc public func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
         if tag == SOCKSConnection.replyTag {
             targetSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
             guard let request = request else {
@@ -395,6 +395,6 @@ class SOCKSConnection: GCDAsyncSocketDelegate, Equatable {
     }
 }
 
-func ==(lhs: SOCKSConnection, rhs: SOCKSConnection) -> Bool {
+public func ==(lhs: SOCKSConnection, rhs: SOCKSConnection) -> Bool {
     return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
 }
