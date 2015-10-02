@@ -17,10 +17,22 @@ protocol SOCKSConnectionDelegate {
 
 // MARK: -
 
-class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
+public class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
     
     private let socket: GCDAsyncSocket
     private var connections = Set<SOCKSConnection>()
+    
+    public var host: String! {
+        get {
+            return socket.localHost
+        }
+    }
+    
+    public var port: UInt16 {
+        get {
+            return socket.localPort
+        }
+    }
     
     init(port: UInt16) throws {
         socket = GCDAsyncSocket(delegate: nil, delegateQueue: dispatch_get_global_queue(0, 0))
@@ -40,7 +52,7 @@ class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
     
     // MARK: - GCDAsyncSocketDelegate
     
-    @objc func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
+    @objc public func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
         let connection = SOCKSConnection(socket: newSocket)
         connection.delgate = self
         connections.insert(connection)
