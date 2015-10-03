@@ -15,6 +15,11 @@ protocol SOCKSConnectionDelegate {
     func connectionDidClose(connection: SOCKSConnection)
 }
 
+protocol DataConvertible {
+    init(data: NSData) throws
+    var data: NSData? { get }
+}
+
 // MARK: -
 
 public class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
@@ -85,7 +90,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
  | 1  |    1     | 1 to 255 |
  +----+----------+----------+
 */
-    struct MethodSelection {
+    struct MethodSelection: DataConvertible {
         let version: UInt8
         let numberOfAuthenticationMethods: UInt8
         let authenticationMethods: [AuthenticationMethod]
@@ -115,6 +120,19 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
                     throw SocketError.NotSupportedAuthenticationMethod
                 }
                 return method
+            }
+        }
+        
+        var data: NSData? {
+            get {
+                var bytes = [UInt8]()
+                
+                bytes.append(version)
+                bytes.append(numberOfAuthenticationMethods)
+                bytes.appendContentsOf(authenticationMethods.map() { $0.rawValue })
+                
+                let data = NSData(bytes: bytes, length: bytes.count)
+                return data
             }
         }
     }
