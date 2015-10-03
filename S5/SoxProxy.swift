@@ -14,10 +14,22 @@ protocol NSDataConvertible {
     var data: NSData? { get }
 }
 
+protocol Taggable {
+    var tag: Int { get }
+}
+
+extension Taggable {
+    var tag: Int {
+        get {
+            return 0
+        }
+    }
+}
+
 extension GCDAsyncSocket {
-    func writeData(data: NSDataConvertible, timeout:NSTimeInterval, tag: Int) {
-        if let data = data.data {
-            self.writeData(data, withTimeout: timeout, tag: tag)
+    func writeData<T where T: NSDataConvertible, T: Taggable>(t: T) {
+        if let data = t.data {
+            self.writeData(data, withTimeout: -1, tag: t.tag)
         }
     }
 }

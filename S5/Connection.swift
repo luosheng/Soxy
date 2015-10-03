@@ -89,7 +89,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |   1    |
  +----+--------+
 */
-    struct MethodSelectionReply: NSDataConvertible {
+    struct MethodSelectionReply: NSDataConvertible, Taggable {
         let method: AuthenticationMethod
         
         init(data: NSData) throws {
@@ -320,7 +320,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         }
         
         let reply = MethodSelectionReply(method: .None)
-        clientSocket.writeData(reply, timeout: -1, tag: 0)
+        clientSocket.writeData(reply)
         clientSocket.readDataWithTimeout(-1, tag: Phase.Request.rawValue)
     }
     
