@@ -139,7 +139,6 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         }
         
         let command: Command
-        let reserved: UInt8
         let addressType: AddressType
         let targetHost: String
         let targetPort: UInt16
@@ -159,7 +158,8 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             }
             command = cmd
             
-            reserved = bytes[offset++]
+            // Reserved
+            _ = bytes[offset++]
             
             guard let atyp = AddressType(rawValue: bytes[offset++]) else {
                 throw SocketError.InvalidAddressType
@@ -242,7 +242,6 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             AddressTypeNotSupported
         }
         let field: Field
-        static let reserved: UInt8 = 0x00
         let addressType: AddressType
         let address: String
         let port: UInt16
@@ -264,7 +263,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                 
                 bytes.append(SoxProxy.SOCKSVersion)
                 bytes.append(field.rawValue)
-                bytes.append(Reply.reserved)
+                bytes.append(SoxProxy.SOCKSReserved)
                 
                 // If reply field is anything other than Succeed, just reply with
                 // VER, REP, RSV

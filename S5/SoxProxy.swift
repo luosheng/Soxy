@@ -11,6 +11,7 @@ import CocoaAsyncSocket
 
 struct SoxProxy {
     static let SOCKSVersion: UInt8 = 0x5
+    static let SOCKSReserved: UInt8 = 0x0
 }
 
 protocol NSDataConvertible {
