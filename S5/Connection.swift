@@ -108,7 +108,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         
         var data: NSData? {
             get {
-                var bytes:[UInt8] = [Connection.version, method.rawValue]
+                var bytes = [Connection.version, method.rawValue]
                 return NSData(bytes: &bytes, length: bytes.count)
             }
         }
@@ -235,7 +235,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |  1  | X'00' |  1   | Variable |    2     |
  +----+-----+-------+------+----------+----------+
 */
-    struct Reply {
+    struct Reply: NSDataConvertible, Taggable {
         enum Field: UInt8 {
             case
             Succeed = 0x00,
@@ -254,7 +254,18 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         var address: String
         var port: UInt16
         
-        var data: NSData {
+        init(data: NSData) throws {
+            throw SocketError.NotImplemented
+        }
+        
+        init(field: Field, addressType: AddressType, address: String, port: UInt16) {
+            self.field = field
+            self.addressType = addressType
+            self.address = address
+            self.port = port
+        }
+        
+        var data: NSData? {
             get {
                 let data = NSMutableData()
                 data.appendBytes(&Reply.version, length: 1)
@@ -289,6 +300,17 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                 data.appendBytes(&networkOctetOrderPort, length: 2)
                 
                 return data
+            }
+        }
+        
+        var tag: Int {
+            get {
+                switch field {
+                case .Succeed:
+                    return Connection.replyTag
+                default:
+                    return 0
+                }
             }
         }
     }
@@ -334,7 +356,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         let request = try Request(data: data)
         let reply = Reply(field: .Succeed, addressType: request.addressType, address: request.targetHost, port: request.targetPort)
         self.request = request
-        clientSocket.writeData(reply.data, withTimeout: -1, tag: Connection.replyTag)
+        clientSocket.writeData(reply)
         clientSocket.readDataWithTimeout(-1, tag: 0)
     }
     
