@@ -40,7 +40,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |    1     | 1 to 255 |
  +----+----------+----------+
 */
-    struct MethodSelection: NSDataConvertible {
+    struct MethodSelection: NSDataConvertible, Taggable {
         let numberOfAuthenticationMethods: UInt8
         let authenticationMethods: [AuthenticationMethod]
         
@@ -305,6 +305,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     private let delegateQueue: dispatch_queue_t
     private let clientSocket: GCDAsyncSocket
     private var targetSocket: GCDAsyncSocket?
+    private var methodSelection: MethodSelection?
     private var request: Request?
     
     public var hashValue: Int {
@@ -332,7 +333,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         guard methodSelection.authenticationMethods.contains(.None) else {
             throw SocketError.SupportedAuthenticationMethodNotFound
         }
-        
+        self.methodSelection = methodSelection
         let reply = MethodSelectionReply(method: .None)
         clientSocket.writeData(reply)
         clientSocket.readData(Phase.Request)
