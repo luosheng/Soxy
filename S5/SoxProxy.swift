@@ -14,6 +14,12 @@ struct SoxProxy {
     static let SOCKSReserved: UInt8 = 0x0
 }
 
+func toByteArray<T>(var value: T) -> [UInt8] {
+    return withUnsafePointer(&value) {
+        Array(UnsafeBufferPointer(start: UnsafePointer<UInt8>($0), count: sizeof(T)))
+    }
+}
+
 protocol NSDataConvertible {
     init(data: NSData) throws
     var data: NSData? { get }

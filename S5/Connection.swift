@@ -130,7 +130,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
  o  DST.ADDR       desired destination address
  o  DST.PORT desired destination port in network octet order
 */
-    struct Request {
+    struct Request: NSDataConvertible, Taggable {
         enum Command: UInt8 {
             case
             Connect = 0x01,
@@ -183,6 +183,26 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             var bindPort: UInt16 = 0
             data.getBytes(&bindPort, range: NSRange(location: offset, length: 2))
             targetPort = bindPort.bigEndian
+        }
+        
+        var data: NSData? {
+            get {
+                var bytes: [UInt8] = [SoxProxy.SOCKSVersion, command.rawValue, SoxProxy.SOCKSReserved, addressType.rawValue]
+                
+                switch addressType {
+                case .DomainName:
+                    bytes.append(UInt8(targetHost.characters.count))
+                    bytes.appendContentsOf([UInt8](targetHost.utf8))
+                    break
+                default:
+                    break
+                }
+                
+                let bindPort = targetPort.littleEndian.byteSwapped
+                bytes.appendContentsOf(toByteArray(bindPort))
+                
+                return NSData(bytes: bytes, length: bytes.count)
+            }
         }
     }
     
