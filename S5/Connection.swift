@@ -19,7 +19,6 @@ protocol ConnectionDelegate {
 
 public class Connection: GCDAsyncSocketDelegate, Hashable {
     
-    static let version: UInt8 = 5
     static let replyTag = 100
     
     enum Phase: Int, Taggable {
@@ -42,7 +41,6 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
  +----+----------+----------+
 */
     struct MethodSelection: NSDataConvertible {
-        let version: UInt8
         let numberOfAuthenticationMethods: UInt8
         let authenticationMethods: [AuthenticationMethod]
         
@@ -54,9 +52,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                 throw SocketError.WrongNumberOfAuthenticationMethods
             }
             
-            version = bytes[0]
-            
-            guard version == Connection.version else {
+            guard bytes[0] == SoxProxy.SOCKSVersion else {
                 throw SocketError.InvalidSOCKSVersion
             }
             
@@ -78,7 +74,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             get {
                 var bytes = [UInt8]()
                 
-                bytes.append(version)
+                bytes.append(SoxProxy.SOCKSVersion)
                 bytes.append(numberOfAuthenticationMethods)
                 bytes.appendContentsOf(authenticationMethods.map() { $0.rawValue })
                 
@@ -108,7 +104,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         
         var data: NSData? {
             get {
-                var bytes = [Connection.version, method.rawValue]
+                var bytes = [SoxProxy.SOCKSVersion, method.rawValue]
                 return NSData(bytes: &bytes, length: bytes.count)
             }
         }
@@ -142,7 +138,6 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             UDPAssociate
         }
         
-        let version: UInt8
         let command: Command
         let reserved: UInt8
         let addressType: AddressType
@@ -155,8 +150,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             
             var offset = 0
             
-            version = bytes[offset++]
-            guard version == Connection.version else {
+            guard bytes[offset++] == SoxProxy.SOCKSVersion else {
                 throw SocketError.InvalidSOCKSVersion
             }
             
@@ -247,7 +241,6 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             CommandNotSupported,
             AddressTypeNotSupported
         }
-        static let version: UInt8 = 0x05
         let field: Field
         static let reserved: UInt8 = 0x00
         let addressType: AddressType
@@ -269,7 +262,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             get {
                 var bytes = [UInt8]()
                 
-                bytes.append(Reply.version)
+                bytes.append(SoxProxy.SOCKSVersion)
                 bytes.append(field.rawValue)
                 bytes.append(Reply.reserved)
                 

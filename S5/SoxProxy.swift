@@ -9,6 +9,10 @@
 import Foundation
 import CocoaAsyncSocket
 
+struct SoxProxy {
+    static let SOCKSVersion: UInt8 = 0x5
+}
+
 protocol NSDataConvertible {
     init(data: NSData) throws
     var data: NSData? { get }
