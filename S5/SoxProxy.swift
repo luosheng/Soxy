@@ -7,8 +7,17 @@
 //
 
 import Foundation
+import CocoaAsyncSocket
 
 protocol NSDataConvertible {
     init(data: NSData) throws
     var data: NSData? { get }
+}
+
+extension GCDAsyncSocket {
+    func writeData(data: NSDataConvertible, timeout:NSTimeInterval, tag: Int) {
+        if let data = data.data {
+            self.writeData(data, withTimeout: timeout, tag: tag)
+        }
+    }
 }

@@ -89,10 +89,18 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |   1    |
  +----+--------+
 */
-    struct MethodSelectionReply {
+    struct MethodSelectionReply: NSDataConvertible {
         let method: AuthenticationMethod
         
-        var data: NSData {
+        init(data: NSData) throws {
+            throw SocketError.NotImplemented
+        }
+        
+        init(method: AuthenticationMethod) {
+            self.method = method
+        }
+        
+        var data: NSData? {
             get {
                 var bytes:[UInt8] = [Connection.version, method.rawValue]
                 return NSData(bytes: &bytes, length: bytes.count)
@@ -211,6 +219,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         case InvalidDomainLength
         case InvalidDomainName
         case InvalidPort
+        case NotImplemented
     }
     
 /*
@@ -311,7 +320,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         }
         
         let reply = MethodSelectionReply(method: .None)
-        clientSocket.writeData(reply.data, withTimeout: -1, tag: 0)
+        clientSocket.writeData(reply, timeout: -1, tag: 0)
         clientSocket.readDataWithTimeout(-1, tag: Phase.Request.rawValue)
     }
     
