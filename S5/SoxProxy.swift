@@ -32,4 +32,8 @@ extension GCDAsyncSocket {
             self.writeData(data, withTimeout: -1, tag: t.tag)
         }
     }
+    
+    func readData<T where T: Taggable>(t: T) {
+        self.readDataWithTimeout(-1, tag: t.tag)
+    }
 }

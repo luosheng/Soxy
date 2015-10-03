@@ -22,10 +22,16 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     static let version: UInt8 = 5
     static let replyTag = 100
     
-    enum Phase: Int {
+    enum Phase: Int, Taggable {
         case
         MethodSelection = 10,
         Request
+        
+        var tag: Int {
+            get {
+                return self.rawValue
+            }
+        }
     }
     
 /*
@@ -303,7 +309,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         clientSocket = socket
         delegateQueue = dispatch_queue_create("net.luosheng.SOCKSConnection.DelegateQueue", DISPATCH_QUEUE_SERIAL)
         clientSocket.setDelegate(self, delegateQueue: delegateQueue)
-        clientSocket.readDataWithTimeout(-1, tag: Phase.MethodSelection.rawValue)
+        clientSocket.readData(Phase.MethodSelection)
     }
     
     func disconnect() {
@@ -321,7 +327,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         
         let reply = MethodSelectionReply(method: .None)
         clientSocket.writeData(reply)
-        clientSocket.readDataWithTimeout(-1, tag: Phase.Request.rawValue)
+        clientSocket.readData(Phase.Request)
     }
     
     private func processRequest(data: NSData) throws {
