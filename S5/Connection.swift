@@ -279,11 +279,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         
         var data: NSData? {
             get {
-                var bytes = [UInt8]()
-                
-                bytes.append(SoxProxy.SOCKSVersion)
-                bytes.append(field.rawValue)
-                bytes.append(SoxProxy.SOCKSReserved)
+                var bytes: [UInt8] = [SoxProxy.SOCKSVersion, field.rawValue, SoxProxy.SOCKSReserved]
                 
                 // If reply field is anything other than Succeed, just reply with
                 // VER, REP, RSV
