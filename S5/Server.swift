@@ -50,7 +50,7 @@ public class Server: GCDAsyncSocketDelegate, ConnectionDelegate {
         connections.insert(connection)
     }
     
-    // MARK SOCKSConnectionDelegate
+    // MARK: - SOCKSConnectionDelegate
     
     func connectionDidClose(connection: Connection) {
         connections.remove(connection)
