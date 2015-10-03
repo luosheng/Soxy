@@ -30,7 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B322009C1BBCAB23009829BD /* S5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = S5.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B322009C1BBCAB23009829BD /* SoxProxy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoxProxy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B322009F1BBCAB23009829BD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B32200A11BBCAB23009829BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B32200A41BBCAB23009829BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -63,7 +63,7 @@
 		B322009D1BBCAB23009829BD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B322009C1BBCAB23009829BD /* S5.app */,
+				B322009C1BBCAB23009829BD /* SoxProxy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,9 +83,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B322009B1BBCAB23009829BD /* S5 */ = {
+		B322009B1BBCAB23009829BD /* SoxProxy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "S5" */;
+			buildConfigurationList = B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "SoxProxy" */;
 			buildPhases = (
 				B32200981BBCAB23009829BD /* Sources */,
 				B32200991BBCAB23009829BD /* Frameworks */,
@@ -96,9 +96,9 @@
 			);
 			dependencies = (
 			);
-			name = S5;
+			name = SoxProxy;
 			productName = S5;
-			productReference = B322009C1BBCAB23009829BD /* S5.app */;
+			productReference = B322009C1BBCAB23009829BD /* SoxProxy.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -115,7 +115,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B32200971BBCAB23009829BD /* Build configuration list for PBXProject "S5" */;
+			buildConfigurationList = B32200971BBCAB23009829BD /* Build configuration list for PBXProject "SoxProxy" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -128,7 +128,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B322009B1BBCAB23009829BD /* S5 */,
+				B322009B1BBCAB23009829BD /* SoxProxy */,
 			);
 		};
 /* End PBXProject section */
@@ -261,7 +261,7 @@
 				INFOPLIST_FILE = S5/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.S5";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SoxProxy;
 			};
 			name = Debug;
 		};
@@ -277,14 +277,14 @@
 				INFOPLIST_FILE = S5/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.S5";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SoxProxy;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B32200971BBCAB23009829BD /* Build configuration list for PBXProject "S5" */ = {
+		B32200971BBCAB23009829BD /* Build configuration list for PBXProject "SoxProxy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B32200A71BBCAB23009829BD /* Debug */,
@@ -293,13 +293,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "S5" */ = {
+		B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "SoxProxy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B32200AA1BBCAB23009829BD /* Debug */,
 				B32200AB1BBCAB23009829BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

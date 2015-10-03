@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:S5.xcodeproj">
+      location = "self:/Users/luosheng/Projects/S5/SoxProxy.xcodeproj">
    </FileRef>
 </Workspace>
