@@ -247,12 +247,12 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             CommandNotSupported,
             AddressTypeNotSupported
         }
-        static var version: UInt8 = 0x05
-        var field: Field
-        static var reserved: UInt8 = 0x00
-        var addressType: AddressType
-        var address: String
-        var port: UInt16
+        static let version: UInt8 = 0x05
+        let field: Field
+        static let reserved: UInt8 = 0x00
+        let addressType: AddressType
+        let address: String
+        let port: UInt16
         
         init(data: NSData) throws {
             throw SocketError.NotImplemented
@@ -267,38 +267,32 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         
         var data: NSData? {
             get {
-                let data = NSMutableData()
-                data.appendBytes(&Reply.version, length: 1)
+                var bytes = [UInt8]()
                 
-                var fieldValue = field.rawValue
-                data.appendBytes(&fieldValue, length: 1)
-                
-                data.appendBytes(&Reply.reserved, length: 1)
+                bytes.append(Reply.version)
+                bytes.append(field.rawValue)
+                bytes.append(Reply.reserved)
                 
                 // If reply field is anything other than Succeed, just reply with
                 // VER, REP, RSV
                 guard field == .Succeed else {
-                    return data
+                    return NSData(bytes: &bytes, length: bytes.count)
                 }
                 
-                var addressTypeValue = addressType.rawValue
-                data.appendBytes(&addressTypeValue, length: 1)
+                bytes.append(addressType.rawValue)
                 
                 switch addressType {
                 case .DomainName:
-                    var domainLength: UInt8 = UInt8(address.characters.count)
-                    data.appendBytes(&domainLength, length: 1)
-                    
-                    var domainName = [UInt8](address.utf8)
-                    data.appendBytes(&domainName, length: address.characters.count)
+                    bytes.append(UInt8(address.characters.count))
+                    bytes.appendContentsOf([UInt8](address.utf8))
                     break
                 default:
                     break
                 }
                 
-                var networkOctetOrderPort = port.littleEndian
+                let data = NSMutableData(bytes: bytes, length: bytes.count)
+                var networkOctetOrderPort: UInt16 = port.littleEndian
                 data.appendBytes(&networkOctetOrderPort, length: 2)
-                
                 return data
             }
         }
