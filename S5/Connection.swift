@@ -15,11 +15,6 @@ protocol ConnectionDelegate {
     func connectionDidClose(connection: Connection)
 }
 
-protocol DataConvertible {
-    init(data: NSData) throws
-    var data: NSData? { get }
-}
-
 // MARK: -
 
 public class Connection: GCDAsyncSocketDelegate, Hashable {
@@ -40,7 +35,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |    1     | 1 to 255 |
  +----+----------+----------+
 */
-    struct MethodSelection: DataConvertible {
+    struct MethodSelection: NSDataConvertible {
         let version: UInt8
         let numberOfAuthenticationMethods: UInt8
         let authenticationMethods: [AuthenticationMethod]
