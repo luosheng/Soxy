@@ -13,6 +13,7 @@
 		B32200AF1BBCAF06009829BD /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; };
 		B32200B01BBCAF06009829BD /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B32200B31BBCAFA1009829BD /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32200B21BBCAFA1009829BD /* Connection.swift */; settings = {ASSET_TAGS = (); }; };
+		B33C53C71BBFBC3600231FCE /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C61BBFBC3600231FCE /* Server.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,6 +38,7 @@
 		B32200A61BBCAB23009829BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = Carthage/Build/Mac/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 		B32200B21BBCAFA1009829BD /* Connection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
+		B33C53C61BBFBC3600231FCE /* Server.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				B32200A11BBCAB23009829BD /* Assets.xcassets */,
 				B32200A31BBCAB23009829BD /* MainMenu.xib */,
 				B32200A61BBCAB23009829BD /* Info.plist */,
+				B33C53C61BBFBC3600231FCE /* Server.swift */,
 				B32200B21BBCAFA1009829BD /* Connection.swift */,
 			);
 			path = S5;
@@ -151,6 +154,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B32200B31BBCAFA1009829BD /* Connection.swift in Sources */,
+				B33C53C71BBFBC3600231FCE /* Server.swift in Sources */,
 				B32200A01BBCAB23009829BD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
