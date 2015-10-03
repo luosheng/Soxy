@@ -12,7 +12,7 @@
 		B32200A51BBCAB23009829BD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B32200A31BBCAB23009829BD /* MainMenu.xib */; };
 		B32200AF1BBCAF06009829BD /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; };
 		B32200B01BBCAF06009829BD /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B32200B31BBCAFA1009829BD /* SOCKSServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32200B21BBCAFA1009829BD /* SOCKSServer.swift */; settings = {ASSET_TAGS = (); }; };
+		B32200B31BBCAFA1009829BD /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32200B21BBCAFA1009829BD /* Connection.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,7 +36,7 @@
 		B32200A41BBCAB23009829BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		B32200A61BBCAB23009829BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = Carthage/Build/Mac/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
-		B32200B21BBCAFA1009829BD /* SOCKSServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SOCKSServer.swift; sourceTree = "<group>"; };
+		B32200B21BBCAFA1009829BD /* Connection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,7 +75,7 @@
 				B32200A11BBCAB23009829BD /* Assets.xcassets */,
 				B32200A31BBCAB23009829BD /* MainMenu.xib */,
 				B32200A61BBCAB23009829BD /* Info.plist */,
-				B32200B21BBCAFA1009829BD /* SOCKSServer.swift */,
+				B32200B21BBCAFA1009829BD /* Connection.swift */,
 			);
 			path = S5;
 			sourceTree = "<group>";
@@ -150,7 +150,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B32200B31BBCAFA1009829BD /* SOCKSServer.swift in Sources */,
+				B32200B31BBCAFA1009829BD /* Connection.swift in Sources */,
 				B32200A01BBCAB23009829BD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

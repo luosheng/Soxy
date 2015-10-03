@@ -11,8 +11,8 @@ import CocoaAsyncSocket
 
 // MARK: -
 
-protocol SOCKSConnectionDelegate {
-    func connectionDidClose(connection: SOCKSConnection)
+protocol ConnectionDelegate {
+    func connectionDidClose(connection: Connection)
 }
 
 protocol DataConvertible {
@@ -22,10 +22,10 @@ protocol DataConvertible {
 
 // MARK: -
 
-public class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
+public class SOCKSServer: GCDAsyncSocketDelegate, ConnectionDelegate {
     
     private let socket: GCDAsyncSocket
-    private var connections = Set<SOCKSConnection>()
+    private var connections = Set<Connection>()
     
     public var host: String! {
         get {
@@ -58,21 +58,21 @@ public class SOCKSServer: GCDAsyncSocketDelegate, SOCKSConnectionDelegate {
     // MARK: - GCDAsyncSocketDelegate
     
     @objc public func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
-        let connection = SOCKSConnection(socket: newSocket)
+        let connection = Connection(socket: newSocket)
         connection.delgate = self
         connections.insert(connection)
     }
     
     // MARK SOCKSConnectionDelegate
     
-    func connectionDidClose(connection: SOCKSConnection) {
+    func connectionDidClose(connection: Connection) {
         connections.remove(connection)
     }
 }
 
 // MARK: -
 
-public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
+public class Connection: GCDAsyncSocketDelegate, Hashable {
     
     static let version: UInt8 = 5
     static let replyTag = 100
@@ -105,7 +105,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
             
             version = bytes[0]
             
-            guard version == SOCKSConnection.version else {
+            guard version == Connection.version else {
                 throw SocketError.InvalidSOCKSVersion
             }
             
@@ -149,7 +149,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
         
         var data: NSData {
             get {
-                var bytes:[UInt8] = [SOCKSConnection.version, method.rawValue]
+                var bytes:[UInt8] = [Connection.version, method.rawValue]
                 return NSData(bytes: &bytes, length: bytes.count)
             }
         }
@@ -197,7 +197,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
             var offset = 0
             
             version = bytes[offset++]
-            guard version == SOCKSConnection.version else {
+            guard version == Connection.version else {
                 throw SocketError.InvalidSOCKSVersion
             }
             
@@ -333,7 +333,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
         }
     }
     
-    var delgate: SOCKSConnectionDelegate?
+    var delgate: ConnectionDelegate?
     private let delegateQueue: dispatch_queue_t
     private let clientSocket: GCDAsyncSocket
     private var targetSocket: GCDAsyncSocket?
@@ -374,7 +374,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
         let request = try Request(data: data)
         let reply = Reply(field: .Succeed, addressType: request.addressType, address: request.targetHost, port: request.targetPort)
         self.request = request
-        clientSocket.writeData(reply.data, withTimeout: -1, tag: SOCKSConnection.replyTag)
+        clientSocket.writeData(reply.data, withTimeout: -1, tag: Connection.replyTag)
         clientSocket.readDataWithTimeout(-1, tag: 0)
     }
     
@@ -412,7 +412,7 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
     }
     
     @objc public func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
-        if tag == SOCKSConnection.replyTag {
+        if tag == Connection.replyTag {
             targetSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
             guard let request = request else {
                 return
@@ -428,6 +428,6 @@ public class SOCKSConnection: GCDAsyncSocketDelegate, Hashable {
     }
 }
 
-public func ==(lhs: SOCKSConnection, rhs: SOCKSConnection) -> Bool {
+public func ==(lhs: Connection, rhs: Connection) -> Bool {
     return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
 }
