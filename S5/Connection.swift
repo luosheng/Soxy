@@ -343,6 +343,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     func disconnect() {
         clientSocket.disconnectAfterReadingAndWriting()
         directSocket?.disconnectAfterReadingAndWriting()
+        proxySocket?.disconnectAfterReadingAndWriting()
     }
     
     // MARK: - Private methods
