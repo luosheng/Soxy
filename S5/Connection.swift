@@ -133,10 +133,9 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
 */
     struct Request: NSDataConvertible, Taggable {
         enum Command: UInt8 {
-            case
-            Connect = 0x01,
-            Bind,
-            UDPAssociate
+            case Connect = 0x01
+            case Bind
+            case UDPAssociate
         }
         
         let command: Command
@@ -252,15 +251,14 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
 */
     struct Reply: NSDataConvertible, Taggable {
         enum Field: UInt8 {
-            case
-            Succeed = 0x00,
-            GeneralSOCKSServerFailure,
-            ConnectionNotAllowedByRuleset,
-            NetworkUnreachable,
-            ConnectionRefused,
-            TTLExpired,
-            CommandNotSupported,
-            AddressTypeNotSupported
+            case Succeed = 0x00
+            case GeneralSOCKSServerFailure
+            case ConnectionNotAllowedByRuleset
+            case NetworkUnreachable
+            case ConnectionRefused
+            case TTLExpired
+            case CommandNotSupported
+            case AddressTypeNotSupported
         }
         let field: Field
         let addressType: AddressType
