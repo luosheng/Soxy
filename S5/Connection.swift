@@ -324,6 +324,8 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     private var targetSocket: GCDAsyncSocket?
     private var methodSelection: MethodSelection?
     private var request: Request?
+    var proxyAddress: Address?
+    private var proxySocket: GCDAsyncSocket?
     
     public var hashValue: Int {
         get {
