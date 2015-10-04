@@ -378,7 +378,11 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             guard let phase = Phase(rawValue: tag) else {
                 // If the tag is not specified, it's in proxy mode
                 if sock == clientSocket {
-                    targetSocket?.writeData(data, withTimeout: -1, tag: 0)
+                    if proxyAddress != nil {
+                        proxySocket?.writeData(data, withTimeout: -1, tag: 0)
+                    } else {
+                        targetSocket?.writeData(data, withTimeout: -1, tag: 0)
+                    }
                 } else {
                     clientSocket.writeData(data, withTimeout: -1, tag: 0)
                 }
@@ -392,6 +396,18 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             case .Request:
                 try self.processRequest(data)
                 break
+            case .MethodSelectionReply:
+                if let request = request {
+                    proxySocket?.writeData(request)
+                    proxySocket?.readData(Phase.RequestReply)
+                }
+                break
+            case .RequestReply:
+                clientSocket.readDataWithTimeout(-1, tag: 0)
+                proxySocket?.readDataWithTimeout(-1, tag: 0)
+                break
+            default:
+                break
             }
         } catch {
             print("error: \(error)")
@@ -401,16 +417,26 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     
     @objc public func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
         if tag == Connection.replyTag {
-            targetSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
-            guard let request = request else {
-                return
-            }
-            do {
-                try targetSocket?.connectToHost(request.targetHost, onPort: request.targetPort, withTimeout: -1)
-                clientSocket.readDataWithTimeout(-1, tag: 0)
-                targetSocket?.readDataWithTimeout(-1, tag: 0)
-            } catch {
-                clientSocket.disconnectAfterReadingAndWriting()
+            
+            if let proxyAddress = proxyAddress {
+                proxySocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
+                try! proxySocket?.connectToHost(proxyAddress.host, onPort: proxyAddress.port)
+                if let methodSelection = methodSelection {
+                    proxySocket?.writeData(methodSelection)
+                    proxySocket?.readData(Phase.MethodSelectionReply)
+                }
+            } else {
+                targetSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
+                guard let request = request else {
+                    return
+                }
+                do {
+                    try targetSocket?.connectToHost(request.targetHost, onPort: request.targetPort, withTimeout: -1)
+                    clientSocket.readDataWithTimeout(-1, tag: 0)
+                    targetSocket?.readDataWithTimeout(-1, tag: 0)
+                } catch {
+                    clientSocket.disconnectAfterReadingAndWriting()
+                }
             }
         }
     }
