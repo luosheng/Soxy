@@ -8,6 +8,7 @@
 
 import Foundation
 import CocoaAsyncSocket
+import NetworkExtension
 
 // MARK: -
 
@@ -322,7 +323,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     private var directSocket: GCDAsyncSocket?
     private var methodSelection: MethodSelection?
     private var request: Request?
-    var proxyAddress: Address?
+    var proxyServer: NEProxyServer?
     private var proxySocket: GCDAsyncSocket?
     
     public var hashValue: Int {
@@ -377,7 +378,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             guard let phase = Phase(rawValue: tag) else {
                 // If the tag is not specified, it's in proxy mode
                 if sock == clientSocket {
-                    if proxyAddress != nil {
+                    if proxyServer != nil {
                         proxySocket?.writeData(data, withTimeout: -1, tag: 0)
                     } else {
                         directSocket?.writeData(data, withTimeout: -1, tag: 0)
@@ -415,9 +416,9 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     @objc public func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
         if tag == Connection.replyTag {
             
-            if let proxyAddress = proxyAddress {
+            if let proxyServer = proxyServer {
                 proxySocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
-                try! proxySocket?.connectToHost(proxyAddress.host, onPort: proxyAddress.port)
+                try! proxySocket?.connectToHost(proxyServer.address, onPort: UInt16(proxyServer.port))
                 if let methodSelection = methodSelection {
                     proxySocket?.writeData(methodSelection)
                     proxySocket?.readData(Phase.MethodSelectionReply)

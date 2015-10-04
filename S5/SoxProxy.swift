@@ -14,11 +14,6 @@ struct SoxProxy {
     static let SOCKSReserved: UInt8 = 0x0
 }
 
-public struct Address {
-    let host: String!
-    let port: UInt16!
-}
-
 func toByteArray<T>(var value: T) -> [UInt8] {
     return withUnsafePointer(&value) {
         Array(UnsafeBufferPointer(start: UnsafePointer<UInt8>($0), count: sizeof(T)))

@@ -8,12 +8,13 @@
 
 import Foundation
 import CocoaAsyncSocket
+import NetworkExtension
 
 public class Server: GCDAsyncSocketDelegate, ConnectionDelegate {
     
     private let socket: GCDAsyncSocket
     private var connections = Set<Connection>()
-    public var proxyAddress: Address?
+    public var proxyServer: NEProxyServer?
     
     public var host: String! {
         get {
@@ -48,7 +49,7 @@ public class Server: GCDAsyncSocketDelegate, ConnectionDelegate {
     @objc public func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
         let connection = Connection(socket: newSocket)
         connection.delgate = self
-        connection.proxyAddress = proxyAddress
+        connection.proxyServer = proxyServer
         connections.insert(connection)
     }
     
