@@ -22,9 +22,10 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     static let replyTag = 100
     
     enum Phase: Int, Taggable {
-        case
-        MethodSelection = 10,
-        Request
+        case MethodSelection = 10
+        case MethodSelectionReply
+        case Request
+        case RequestReply
         
         var tag: Int {
             get {
