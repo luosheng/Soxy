@@ -321,7 +321,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     var delgate: ConnectionDelegate?
     private let delegateQueue: dispatch_queue_t
     private let clientSocket: GCDAsyncSocket
-    private var targetSocket: GCDAsyncSocket?
+    private var directSocket: GCDAsyncSocket?
     private var methodSelection: MethodSelection?
     private var request: Request?
     var proxyAddress: Address?
@@ -342,7 +342,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     
     func disconnect() {
         clientSocket.disconnectAfterReadingAndWriting()
-        targetSocket?.disconnectAfterReadingAndWriting()
+        directSocket?.disconnectAfterReadingAndWriting()
     }
     
     // MARK: - Private methods
@@ -381,7 +381,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                     if proxyAddress != nil {
                         proxySocket?.writeData(data, withTimeout: -1, tag: 0)
                     } else {
-                        targetSocket?.writeData(data, withTimeout: -1, tag: 0)
+                        directSocket?.writeData(data, withTimeout: -1, tag: 0)
                     }
                 } else {
                     clientSocket.writeData(data, withTimeout: -1, tag: 0)
@@ -406,8 +406,6 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                 clientSocket.readDataWithTimeout(-1, tag: 0)
                 proxySocket?.readDataWithTimeout(-1, tag: 0)
                 break
-            default:
-                break
             }
         } catch {
             print("error: \(error)")
@@ -426,14 +424,14 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                     proxySocket?.readData(Phase.MethodSelectionReply)
                 }
             } else {
-                targetSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
+                directSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
                 guard let request = request else {
                     return
                 }
                 do {
-                    try targetSocket?.connectToHost(request.targetHost, onPort: request.targetPort, withTimeout: -1)
+                    try directSocket?.connectToHost(request.targetHost, onPort: request.targetPort, withTimeout: -1)
                     clientSocket.readDataWithTimeout(-1, tag: 0)
-                    targetSocket?.readDataWithTimeout(-1, tag: 0)
+                    directSocket?.readDataWithTimeout(-1, tag: 0)
                 } catch {
                     clientSocket.disconnectAfterReadingAndWriting()
                 }
