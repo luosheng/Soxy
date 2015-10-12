@@ -318,12 +318,12 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     }
     
     var delgate: ConnectionDelegate?
+    weak var server: Server?
     private let delegateQueue: dispatch_queue_t
     private let clientSocket: GCDAsyncSocket
     private var directSocket: GCDAsyncSocket?
     private var methodSelection: MethodSelection?
     private var request: Request?
-    var proxyServer: NEProxyServer?
     private var proxySocket: GCDAsyncSocket?
     
     public var hashValue: Int {
@@ -378,7 +378,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             guard let phase = Phase(rawValue: tag) else {
                 // If the tag is not specified, it's in proxy mode
                 if sock == clientSocket {
-                    if proxyServer != nil {
+                    if server?.proxyServer != nil {
                         proxySocket?.writeData(data, withTimeout: -1, tag: 0)
                     } else {
                         directSocket?.writeData(data, withTimeout: -1, tag: 0)
@@ -416,7 +416,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     @objc public func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
         if tag == Connection.replyTag {
             
-            if let proxyServer = proxyServer {
+            if let proxyServer = server?.proxyServer {
                 proxySocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
                 try! proxySocket?.connectToHost(proxyServer.address, onPort: UInt16(proxyServer.port))
                 if let methodSelection = methodSelection {
