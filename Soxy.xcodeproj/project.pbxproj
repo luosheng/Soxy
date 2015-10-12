@@ -32,7 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B322009C1BBCAB23009829BD /* SoxProxy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoxProxy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B322009C1BBCAB23009829BD /* Soxy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Soxy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B322009F1BBCAB23009829BD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B32200A11BBCAB23009829BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B32200A41BBCAB23009829BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -59,7 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */,
-				B322009E1BBCAB23009829BD /* S5 */,
+				B322009E1BBCAB23009829BD /* Soxy */,
 				B322009D1BBCAB23009829BD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -67,12 +67,12 @@
 		B322009D1BBCAB23009829BD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B322009C1BBCAB23009829BD /* SoxProxy.app */,
+				B322009C1BBCAB23009829BD /* Soxy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B322009E1BBCAB23009829BD /* S5 */ = {
+		B322009E1BBCAB23009829BD /* Soxy */ = {
 			isa = PBXGroup;
 			children = (
 				B322009F1BBCAB23009829BD /* AppDelegate.swift */,
@@ -83,15 +83,16 @@
 				B33C53C61BBFBC3600231FCE /* Server.swift */,
 				B32200B21BBCAFA1009829BD /* Connection.swift */,
 			);
-			path = S5;
+			name = Soxy;
+			path = Soxy;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B322009B1BBCAB23009829BD /* SoxProxy */ = {
+		B322009B1BBCAB23009829BD /* Soxy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "SoxProxy" */;
+			buildConfigurationList = B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "Soxy" */;
 			buildPhases = (
 				B32200981BBCAB23009829BD /* Sources */,
 				B32200991BBCAB23009829BD /* Frameworks */,
@@ -102,9 +103,9 @@
 			);
 			dependencies = (
 			);
-			name = SoxProxy;
-			productName = S5;
-			productReference = B322009C1BBCAB23009829BD /* SoxProxy.app */;
+			name = Soxy;
+			productName = Soxy;
+			productReference = B322009C1BBCAB23009829BD /* Soxy.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -121,7 +122,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B32200971BBCAB23009829BD /* Build configuration list for PBXProject "SoxProxy" */;
+			buildConfigurationList = B32200971BBCAB23009829BD /* Build configuration list for PBXProject "Soxy" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -134,7 +135,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B322009B1BBCAB23009829BD /* SoxProxy */,
+				B322009B1BBCAB23009829BD /* Soxy */,
 			);
 		};
 /* End PBXProject section */
@@ -266,10 +267,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = S5/Info.plist;
+				INFOPLIST_FILE = Soxy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.S5";
-				PRODUCT_NAME = SoxProxy;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.Soxy";
+				PRODUCT_NAME = Soxy;
 			};
 			name = Debug;
 		};
@@ -282,17 +283,17 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
-				INFOPLIST_FILE = S5/Info.plist;
+				INFOPLIST_FILE = Soxy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.S5";
-				PRODUCT_NAME = SoxProxy;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.Soxy";
+				PRODUCT_NAME = Soxy;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B32200971BBCAB23009829BD /* Build configuration list for PBXProject "SoxProxy" */ = {
+		B32200971BBCAB23009829BD /* Build configuration list for PBXProject "Soxy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B32200A71BBCAB23009829BD /* Debug */,
@@ -301,7 +302,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "SoxProxy" */ = {
+		B32200A91BBCAB23009829BD /* Build configuration list for PBXNativeTarget "Soxy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B32200AA1BBCAB23009829BD /* Debug */,

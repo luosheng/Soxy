@@ -7,12 +7,21 @@
 //
 
 import Cocoa
+import NetworkExtension
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var window: NSWindow!
-
+    
+    let server: Server
+    
+    override init() {
+        server = try! Server(port: 8080)
+        server.proxyServer = NEProxyServer(address: "127.0.0.1", port: 1080)
+        print(server.host, server.port)
+        super.init()
+    }
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         // Insert code here to initialize your application
