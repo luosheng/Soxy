@@ -318,7 +318,7 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     }
     
     var delgate: ConnectionDelegate?
-    weak var server: Server?
+    var server: Proxyable?
     private let delegateQueue: dispatch_queue_t
     private let clientSocket: GCDAsyncSocket
     private var directSocket: GCDAsyncSocket?

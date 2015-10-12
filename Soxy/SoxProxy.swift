@@ -8,6 +8,7 @@
 
 import Foundation
 import CocoaAsyncSocket
+import NetworkExtension
 
 struct SoxProxy {
     static let SOCKSVersion: UInt8 = 0x5
@@ -27,6 +28,10 @@ protocol NSDataConvertible {
 
 protocol Taggable {
     var tag: Int { get }
+}
+
+protocol Proxyable {
+    var proxyServer: NEProxyServer? { get }
 }
 
 extension Taggable {

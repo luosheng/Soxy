@@ -10,7 +10,7 @@ import Foundation
 import CocoaAsyncSocket
 import NetworkExtension
 
-public class Server: GCDAsyncSocketDelegate, ConnectionDelegate {
+public class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
     
     private let socket: GCDAsyncSocket
     private var connections = Set<Connection>()
