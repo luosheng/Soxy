@@ -15,7 +15,7 @@
 		B32200B31BBCAFA1009829BD /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32200B21BBCAFA1009829BD /* Connection.swift */; };
 		B32B81E21D63D72A00076C52 /* GCDAsyncSocketExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32B81E11D63D72A00076C52 /* GCDAsyncSocketExtensions.swift */; };
 		B33C53C71BBFBC3600231FCE /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C61BBFBC3600231FCE /* Server.swift */; };
-		B33C53CA1BBFBE1300231FCE /* SoxProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C91BBFBE1300231FCE /* SoxProxy.swift */; };
+		B33C53CA1BBFBE1300231FCE /* Soxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C91BBFBE1300231FCE /* Soxy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,7 +42,7 @@
 		B32200B21BBCAFA1009829BD /* Connection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		B32B81E11D63D72A00076C52 /* GCDAsyncSocketExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCDAsyncSocketExtensions.swift; sourceTree = "<group>"; };
 		B33C53C61BBFBC3600231FCE /* Server.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
-		B33C53C91BBFBE1300231FCE /* SoxProxy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoxProxy.swift; sourceTree = "<group>"; };
+		B33C53C91BBFBE1300231FCE /* Soxy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Soxy.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +81,7 @@
 				B32200A11BBCAB23009829BD /* Assets.xcassets */,
 				B32200A31BBCAB23009829BD /* MainMenu.xib */,
 				B32200A61BBCAB23009829BD /* Info.plist */,
-				B33C53C91BBFBE1300231FCE /* SoxProxy.swift */,
+				B33C53C91BBFBE1300231FCE /* Soxy.swift */,
 				B33C53C61BBFBC3600231FCE /* Server.swift */,
 				B32200B21BBCAFA1009829BD /* Connection.swift */,
 				B32B81E11D63D72A00076C52 /* GCDAsyncSocketExtensions.swift */,
@@ -162,7 +162,7 @@
 			files = (
 				B32B81E21D63D72A00076C52 /* GCDAsyncSocketExtensions.swift in Sources */,
 				B32200B31BBCAFA1009829BD /* Connection.swift in Sources */,
-				B33C53CA1BBFBE1300231FCE /* SoxProxy.swift in Sources */,
+				B33C53CA1BBFBE1300231FCE /* Soxy.swift in Sources */,
 				B33C53C71BBFBC3600231FCE /* Server.swift in Sources */,
 				B32200A01BBCAB23009829BD /* AppDelegate.swift in Sources */,
 			);
