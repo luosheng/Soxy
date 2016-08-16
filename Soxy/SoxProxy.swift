@@ -41,15 +41,3 @@ extension Taggable {
         }
     }
 }
-
-extension GCDAsyncSocket {
-    func writeData<T>(_ t: T) where T: NSDataConvertible, T: Taggable {
-        if let data = t.data {
-            self.write(data, withTimeout: -1, tag: t.tag)
-        }
-    }
-    
-    func readData<T>(_ t: T) where T: Taggable {
-        self.readData(withTimeout: -1, tag: t.tag)
-    }
-}
