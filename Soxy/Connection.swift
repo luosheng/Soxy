@@ -228,8 +228,8 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
     }
     
     enum AddressType: UInt8 {
-        case iPv4 = 0x01
-        case iPv6 = 0x04
+        case ipv4 = 0x01
+        case ipv6 = 0x04
         case domainName = 0x03
     }
     
