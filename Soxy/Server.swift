@@ -10,28 +10,28 @@ import Foundation
 import CocoaAsyncSocket
 import NetworkExtension
 
-public class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
+open class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
     
-    private let socket: GCDAsyncSocket
-    private var connections = Set<Connection>()
+    fileprivate let socket: GCDAsyncSocket
+    fileprivate var connections = Set<Connection>()
     internal var proxyServer: NEProxyServer?
     
-    public var host: String! {
+    open var host: String! {
         get {
             return socket.localHost
         }
     }
     
-    public var port: UInt16 {
+    open var port: UInt16 {
         get {
             return socket.localPort
         }
     }
     
     init(port: UInt16) throws {
-        socket = GCDAsyncSocket(delegate: nil, delegateQueue: dispatch_get_global_queue(0, 0))
+        socket = GCDAsyncSocket(delegate: nil, delegateQueue: DispatchQueue.global(qos: .default))
         socket.delegate = self
-        try socket.acceptOnPort(port)
+        try socket.accept(onPort: port)
     }
     
     deinit {
@@ -46,7 +46,7 @@ public class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
     
     // MARK: - GCDAsyncSocketDelegate
     
-    @objc public func socket(sock: GCDAsyncSocket!, didAcceptNewSocket newSocket: GCDAsyncSocket!) {
+    @objc open func socket(_ sock: GCDAsyncSocket, didAcceptNewSocket newSocket: GCDAsyncSocket) {
         let connection = Connection(socket: newSocket)
         connection.delgate = self
         connection.server = self
@@ -55,7 +55,7 @@ public class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
     
     // MARK: - SOCKSConnectionDelegate
     
-    func connectionDidClose(connection: Connection) {
+    func connectionDidClose(_ connection: Connection) {
         connections.remove(connection)
     }
 }

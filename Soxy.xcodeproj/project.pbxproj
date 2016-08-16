@@ -12,9 +12,9 @@
 		B32200A51BBCAB23009829BD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B32200A31BBCAB23009829BD /* MainMenu.xib */; };
 		B32200AF1BBCAF06009829BD /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; };
 		B32200B01BBCAF06009829BD /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B32200AE1BBCAF06009829BD /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B32200B31BBCAFA1009829BD /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32200B21BBCAFA1009829BD /* Connection.swift */; settings = {ASSET_TAGS = (); }; };
-		B33C53C71BBFBC3600231FCE /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C61BBFBC3600231FCE /* Server.swift */; settings = {ASSET_TAGS = (); }; };
-		B33C53CA1BBFBE1300231FCE /* SoxProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C91BBFBE1300231FCE /* SoxProxy.swift */; settings = {ASSET_TAGS = (); }; };
+		B32200B31BBCAFA1009829BD /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32200B21BBCAFA1009829BD /* Connection.swift */; };
+		B33C53C71BBFBC3600231FCE /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C61BBFBC3600231FCE /* Server.swift */; };
+		B33C53CA1BBFBE1300231FCE /* SoxProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33C53C91BBFBE1300231FCE /* SoxProxy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -83,7 +83,6 @@
 				B33C53C61BBFBC3600231FCE /* Server.swift */,
 				B32200B21BBCAFA1009829BD /* Connection.swift */,
 			);
-			name = Soxy;
 			path = Soxy;
 			sourceTree = "<group>";
 		};
@@ -114,11 +113,12 @@
 		B32200941BBCAB23009829BD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Pop Tap";
 				TargetAttributes = {
 					B322009B1BBCAB23009829BD = {
 						CreatedOnToolsVersion = 7.0;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -191,8 +191,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -235,8 +237,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -255,6 +259,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Release;
 		};
@@ -271,6 +276,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.Soxy";
 				PRODUCT_NAME = Soxy;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -287,6 +293,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pop-tap.Soxy";
 				PRODUCT_NAME = Soxy;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

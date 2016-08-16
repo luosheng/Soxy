@@ -15,15 +15,15 @@ struct SoxProxy {
     static let SOCKSReserved: UInt8 = 0x0
 }
 
-func toByteArray<T>(var value: T) -> [UInt8] {
-    return withUnsafePointer(&value) {
-        Array(UnsafeBufferPointer(start: UnsafePointer<UInt8>($0), count: sizeof(T)))
+extension UInt16 {
+    func toByteArray() -> [UInt8] {
+        return [UInt8(self >> 8 & 0x00FF), UInt8(self & 0x00FF)]
     }
 }
 
 protocol NSDataConvertible {
-    init(data: NSData) throws
-    var data: NSData? { get }
+    init(data: Data) throws
+    var data: Data? { get }
 }
 
 protocol Taggable {
@@ -43,13 +43,13 @@ extension Taggable {
 }
 
 extension GCDAsyncSocket {
-    func writeData<T where T: NSDataConvertible, T: Taggable>(t: T) {
+    func writeData<T>(_ t: T) where T: NSDataConvertible, T: Taggable {
         if let data = t.data {
-            self.writeData(data, withTimeout: -1, tag: t.tag)
+            self.write(data, withTimeout: -1, tag: t.tag)
         }
     }
     
-    func readData<T where T: Taggable>(t: T) {
-        self.readDataWithTimeout(-1, tag: t.tag)
+    func readData<T>(_ t: T) where T: Taggable {
+        self.readData(withTimeout: -1, tag: t.tag)
     }
 }

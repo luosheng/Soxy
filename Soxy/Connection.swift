@@ -13,20 +13,20 @@ import NetworkExtension
 // MARK: -
 
 protocol ConnectionDelegate {
-    func connectionDidClose(connection: Connection)
+    func connectionDidClose(_ connection: Connection)
 }
 
 // MARK: -
 
-public class Connection: GCDAsyncSocketDelegate, Hashable {
+open class Connection: GCDAsyncSocketDelegate, Hashable {
     
     static let replyTag = 100
     
     enum Phase: Int, Taggable {
-        case MethodSelection = 10
-        case MethodSelectionReply
-        case Request
-        case RequestReply
+        case methodSelection = 10
+        case methodSelectionReply
+        case request
+        case requestReply
         
         var tag: Int {
             get {
@@ -46,41 +46,41 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         let numberOfAuthenticationMethods: UInt8
         let authenticationMethods: [AuthenticationMethod]
         
-        init(data: NSData) throws {
-            var bytes: [UInt8] = [UInt8](count: data.length, repeatedValue: 0)
-            data.getBytes(&bytes, length: bytes.count)
+        init(data: Data) throws {
+            var bytes: [UInt8] = [UInt8](repeating: 0, count: data.count)
+            (data as NSData).getBytes(&bytes, length: bytes.count)
             
             guard bytes.count >= 3 else {
-                throw SocketError.WrongNumberOfAuthenticationMethods
+                throw SocketError.wrongNumberOfAuthenticationMethods
             }
             
             guard bytes[0] == SoxProxy.SOCKSVersion else {
-                throw SocketError.InvalidSOCKSVersion
+                throw SocketError.invalidSOCKSVersion
             }
             
             numberOfAuthenticationMethods = bytes[1]
             
             guard bytes.count == 1 + 1 + Int(numberOfAuthenticationMethods) else {
-                throw SocketError.WrongNumberOfAuthenticationMethods
+                throw SocketError.wrongNumberOfAuthenticationMethods
             }
             
             authenticationMethods = try bytes[2...(bytes.count - 1)].map() {
                 guard let method = AuthenticationMethod(rawValue: $0) else {
-                    throw SocketError.NotSupportedAuthenticationMethod
+                    throw SocketError.notSupportedAuthenticationMethod
                 }
                 return method
             }
         }
         
-        var data: NSData? {
+        var data: Data? {
             get {
                 var bytes = [UInt8]()
                 
                 bytes.append(SoxProxy.SOCKSVersion)
                 bytes.append(numberOfAuthenticationMethods)
-                bytes.appendContentsOf(authenticationMethods.map() { $0.rawValue })
+                bytes.append(contentsOf: authenticationMethods.map() { $0.rawValue })
                 
-                let data = NSData(bytes: bytes, length: bytes.count)
+                let data = Data(bytes: UnsafePointer<UInt8>(bytes), count: bytes.count)
                 return data
             }
         }
@@ -96,18 +96,18 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     struct MethodSelectionReply: NSDataConvertible, Taggable {
         let method: AuthenticationMethod
         
-        init(data: NSData) throws {
-            throw SocketError.NotImplemented
+        init(data: Data) throws {
+            throw SocketError.notImplemented
         }
         
         init(method: AuthenticationMethod) {
             self.method = method
         }
         
-        var data: NSData? {
+        var data: Data? {
             get {
-                var bytes = [SoxProxy.SOCKSVersion, method.rawValue]
-                return NSData(bytes: &bytes, length: bytes.count)
+                let bytes = [SoxProxy.SOCKSVersion, method.rawValue]
+                return Data(bytes: bytes)
             }
         }
     }
@@ -134,9 +134,9 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
 */
     struct Request: NSDataConvertible, Taggable {
         enum Command: UInt8 {
-            case Connect = 0x01
-            case Bind
-            case UDPAssociate
+            case connect = 0x01
+            case bind
+            case udpAssociate
         }
         
         let command: Command
@@ -144,34 +144,39 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         let targetHost: String
         let targetPort: UInt16
         
-        init(data: NSData) throws {
-            var bytes = [UInt8](count: data.length, repeatedValue: 0)
-            data.getBytes(&bytes, length: bytes.count)
+        init(data: Data) throws {
+            var bytes = [UInt8](repeating: 0, count: data.count)
+            (data as NSData).getBytes(&bytes, length: bytes.count)
             
             var offset = 0
             
-            guard bytes[offset++] == SoxProxy.SOCKSVersion else {
-                throw SocketError.InvalidSOCKSVersion
+            guard bytes[offset] == SoxProxy.SOCKSVersion else {
+                throw SocketError.invalidSOCKSVersion
             }
+            offset += 1
             
-            guard let cmd = Command(rawValue: bytes[offset++]) else {
-                throw SocketError.InvalidRequestCommand
+            guard let cmd = Command(rawValue: bytes[offset]) else {
+                throw SocketError.invalidRequestCommand
             }
+            offset += 1
             command = cmd
             
             // Reserved
-            _ = bytes[offset++]
+            _ = bytes[offset]
+            offset += 1
             
-            guard let atyp = AddressType(rawValue: bytes[offset++]) else {
-                throw SocketError.InvalidAddressType
+            guard let atyp = AddressType(rawValue: bytes[offset]) else {
+                throw SocketError.invalidAddressType
             }
+            offset += 1
             addressType = atyp
             
             switch addressType {
-            case .DomainName:
-                let domainNameLength = bytes[offset++]
-                guard let domainName = String(bytes: bytes[offset..<(offset + Int(domainNameLength))], encoding: NSASCIIStringEncoding) else {
-                    throw SocketError.InvalidDomainName
+            case .domainName:
+                let domainNameLength = bytes[offset]
+                offset += 1
+                guard let domainName = String(bytes: bytes[offset..<(offset + Int(domainNameLength))], encoding: String.Encoding.ascii) else {
+                    throw SocketError.invalidDomainName
                 }
                 targetHost = domainName
                 offset += Int(domainNameLength)
@@ -182,27 +187,27 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             }
             
             var bindPort: UInt16 = 0
-            data.getBytes(&bindPort, range: NSRange(location: offset, length: 2))
+            (data as NSData).getBytes(&bindPort, range: NSRange(location: offset, length: 2))
             targetPort = bindPort.bigEndian
         }
         
-        var data: NSData? {
+        var data: Data? {
             get {
                 var bytes: [UInt8] = [SoxProxy.SOCKSVersion, command.rawValue, SoxProxy.SOCKSReserved, addressType.rawValue]
                 
                 switch addressType {
-                case .DomainName:
+                case .domainName:
                     bytes.append(UInt8(targetHost.characters.count))
-                    bytes.appendContentsOf([UInt8](targetHost.utf8))
+                    bytes.append(contentsOf: [UInt8](targetHost.utf8))
                     break
                 default:
                     break
                 }
                 
                 let bindPort = targetPort.littleEndian.byteSwapped
-                bytes.appendContentsOf(toByteArray(bindPort))
+                bytes.append(contentsOf: bindPort.toByteArray())
                 
-                return NSData(bytes: bytes, length: bytes.count)
+                return Data(bytes: UnsafePointer<UInt8>(bytes), count: bytes.count)
             }
         }
     }
@@ -217,30 +222,30 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
 */
     enum AuthenticationMethod: UInt8 {
         case
-        None = 0x00,
-        GSSAPI,
-        UsernamePassword
+        none = 0x00,
+        gssapi,
+        usernamePassword
     }
     
     enum AddressType: UInt8 {
-        case IPv4 = 0x01
-        case IPv6 = 0x04
-        case DomainName = 0x03
+        case iPv4 = 0x01
+        case iPv6 = 0x04
+        case domainName = 0x03
     }
     
-    enum SocketError: ErrorType {
-        case InvalidSOCKSVersion
-        case UnableToRetrieveNumberOfAuthenticationMethods
-        case NotSupportedAuthenticationMethod
-        case SupportedAuthenticationMethodNotFound
-        case WrongNumberOfAuthenticationMethods
-        case InvalidRequestCommand
-        case InvalidHeaderFragment
-        case InvalidAddressType
-        case InvalidDomainLength
-        case InvalidDomainName
-        case InvalidPort
-        case NotImplemented
+    enum SocketError: Error {
+        case invalidSOCKSVersion
+        case unableToRetrieveNumberOfAuthenticationMethods
+        case notSupportedAuthenticationMethod
+        case supportedAuthenticationMethodNotFound
+        case wrongNumberOfAuthenticationMethods
+        case invalidRequestCommand
+        case invalidHeaderFragment
+        case invalidAddressType
+        case invalidDomainLength
+        case invalidDomainName
+        case invalidPort
+        case notImplemented
     }
     
 /*
@@ -252,22 +257,22 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
 */
     struct Reply: NSDataConvertible, Taggable {
         enum Field: UInt8 {
-            case Succeed = 0x00
-            case GeneralSOCKSServerFailure
-            case ConnectionNotAllowedByRuleset
-            case NetworkUnreachable
-            case ConnectionRefused
-            case TTLExpired
-            case CommandNotSupported
-            case AddressTypeNotSupported
+            case succeed = 0x00
+            case generalSOCKSServerFailure
+            case connectionNotAllowedByRuleset
+            case networkUnreachable
+            case connectionRefused
+            case ttlExpired
+            case commandNotSupported
+            case addressTypeNotSupported
         }
         let field: Field
         let addressType: AddressType
         let address: String
         let port: UInt16
         
-        init(data: NSData) throws {
-            throw SocketError.NotImplemented
+        init(data: Data) throws {
+            throw SocketError.notImplemented
         }
         
         init(field: Field, addressType: AddressType, address: String, port: UInt16) {
@@ -277,22 +282,22 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
             self.port = port
         }
         
-        var data: NSData? {
+        var data: Data? {
             get {
                 var bytes: [UInt8] = [SoxProxy.SOCKSVersion, field.rawValue, SoxProxy.SOCKSReserved]
                 
                 // If reply field is anything other than Succeed, just reply with
                 // VER, REP, RSV
-                guard field == .Succeed else {
-                    return NSData(bytes: &bytes, length: bytes.count)
+                guard field == .succeed else {
+                    return Data(bytes: bytes)
                 }
                 
                 bytes.append(addressType.rawValue)
                 
                 switch addressType {
-                case .DomainName:
+                case .domainName:
                     bytes.append(UInt8(address.characters.count))
-                    bytes.appendContentsOf([UInt8](address.utf8))
+                    bytes.append(contentsOf: [UInt8](address.utf8))
                     break
                 default:
                     break
@@ -300,15 +305,15 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                 
                 let data = NSMutableData(bytes: bytes, length: bytes.count)
                 var networkOctetOrderPort: UInt16 = port.littleEndian
-                data.appendBytes(&networkOctetOrderPort, length: 2)
-                return data
+                data.append(&networkOctetOrderPort, length: 2)
+                return data as Data
             }
         }
         
         var tag: Int {
             get {
                 switch field {
-                case .Succeed:
+                case .succeed:
                     return Connection.replyTag
                 default:
                     return 0
@@ -319,24 +324,28 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     
     var delgate: ConnectionDelegate?
     var server: Proxyable?
-    private let delegateQueue: dispatch_queue_t
-    private let clientSocket: GCDAsyncSocket
-    private var directSocket: GCDAsyncSocket?
-    private var methodSelection: MethodSelection?
-    private var request: Request?
-    private var proxySocket: GCDAsyncSocket?
+    fileprivate let delegateQueue: DispatchQueue
+    fileprivate let clientSocket: GCDAsyncSocket
+    fileprivate var directSocket: GCDAsyncSocket?
+    fileprivate var methodSelection: MethodSelection?
+    fileprivate var request: Request?
+    fileprivate var proxySocket: GCDAsyncSocket?
     
-    public var hashValue: Int {
+    open var hashValue: Int {
         get {
             return ObjectIdentifier(self).hashValue
         }
     }
     
+    public static func ==(lhs: Connection, rhs: Connection) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
     init(socket: GCDAsyncSocket) {
         clientSocket = socket
-        delegateQueue = dispatch_queue_create("net.luosheng.SOCKSConnection.DelegateQueue", DISPATCH_QUEUE_SERIAL)
+        delegateQueue = DispatchQueue(label: "net.luosheng.SOCKSConnection.DelegateQueue", attributes: [])
         clientSocket.setDelegate(self, delegateQueue: delegateQueue)
-        clientSocket.readData(Phase.MethodSelection)
+        clientSocket.readData(Phase.methodSelection)
     }
     
     func disconnect() {
@@ -347,64 +356,64 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
     
     // MARK: - Private methods
     
-    private func processMethodSelection(data: NSData) throws {
+    fileprivate func processMethodSelection(_ data: Data) throws {
         let methodSelection = try MethodSelection(data: data)
-        guard methodSelection.authenticationMethods.contains(.None) else {
-            throw SocketError.SupportedAuthenticationMethodNotFound
+        guard methodSelection.authenticationMethods.contains(.none) else {
+            throw SocketError.supportedAuthenticationMethodNotFound
         }
         self.methodSelection = methodSelection
-        let reply = MethodSelectionReply(method: .None)
+        let reply = MethodSelectionReply(method: .none)
         clientSocket.writeData(reply)
-        clientSocket.readData(Phase.Request)
+        clientSocket.readData(Phase.request)
     }
     
-    private func processRequest(data: NSData) throws {
+    fileprivate func processRequest(_ data: Data) throws {
         let request = try Request(data: data)
-        let reply = Reply(field: .Succeed, addressType: request.addressType, address: request.targetHost, port: request.targetPort)
+        let reply = Reply(field: .succeed, addressType: request.addressType, address: request.targetHost, port: request.targetPort)
         self.request = request
         clientSocket.writeData(reply)
-        clientSocket.readDataWithTimeout(-1, tag: 0)
+        clientSocket.readData(withTimeout: -1, tag: 0)
     }
     
     // MARK: - GCDAsyncSocketDelegate
     
-    @objc public func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
-        self.disconnect()
+    @objc open func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
+        disconnect()
         delgate?.connectionDidClose(self)
     }
 
-    @objc public func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
+    @objc open func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
         do {
             guard let phase = Phase(rawValue: tag) else {
                 // If the tag is not specified, it's in proxy mode
                 if sock == clientSocket {
                     if server?.proxyServer != nil {
-                        proxySocket?.writeData(data, withTimeout: -1, tag: 0)
+                        proxySocket?.write(data, withTimeout: -1, tag: 0)
                     } else {
-                        directSocket?.writeData(data, withTimeout: -1, tag: 0)
+                        directSocket?.write(data, withTimeout: -1, tag: 0)
                     }
                 } else {
-                    clientSocket.writeData(data, withTimeout: -1, tag: 0)
+                    clientSocket.write(data, withTimeout: -1, tag: 0)
                 }
-                sock.readDataWithTimeout(-1, tag: 0)
+                sock.readData(withTimeout: -1, tag: 0)
                 return
             }
             switch phase {
-            case .MethodSelection:
+            case .methodSelection:
                 try self.processMethodSelection(data)
                 break
-            case .Request:
+            case .request:
                 try self.processRequest(data)
                 break
-            case .MethodSelectionReply:
+            case .methodSelectionReply:
                 if let request = request {
                     proxySocket?.writeData(request)
-                    proxySocket?.readData(Phase.RequestReply)
+                    proxySocket?.readData(Phase.requestReply)
                 }
                 break
-            case .RequestReply:
-                clientSocket.readDataWithTimeout(-1, tag: 0)
-                proxySocket?.readDataWithTimeout(-1, tag: 0)
+            case .requestReply:
+                clientSocket.readData(withTimeout: -1, tag: 0)
+                proxySocket?.readData(withTimeout: -1, tag: 0)
                 break
             }
         } catch {
@@ -413,15 +422,15 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
         }
     }
     
-    @objc public func socket(sock: GCDAsyncSocket!, didWriteDataWithTag tag: Int) {
+    @objc open func socket(_ sock: GCDAsyncSocket, didWriteDataWithTag tag: Int) {
         if tag == Connection.replyTag {
             
             if let proxyServer = server?.proxyServer {
                 proxySocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
-                try! proxySocket?.connectToHost(proxyServer.address, onPort: UInt16(proxyServer.port))
+                try! proxySocket?.connect(toHost: proxyServer.address, onPort: UInt16(proxyServer.port))
                 if let methodSelection = methodSelection {
                     proxySocket?.writeData(methodSelection)
-                    proxySocket?.readData(Phase.MethodSelectionReply)
+                    proxySocket?.readData(Phase.methodSelectionReply)
                 }
             } else {
                 directSocket = GCDAsyncSocket(delegate: self, delegateQueue: delegateQueue)
@@ -429,17 +438,13 @@ public class Connection: GCDAsyncSocketDelegate, Hashable {
                     return
                 }
                 do {
-                    try directSocket?.connectToHost(request.targetHost, onPort: request.targetPort, withTimeout: -1)
-                    clientSocket.readDataWithTimeout(-1, tag: 0)
-                    directSocket?.readDataWithTimeout(-1, tag: 0)
+                    try directSocket?.connect(toHost: request.targetHost, onPort: request.targetPort, withTimeout: -1)
+                    clientSocket.readData(withTimeout: -1, tag: 0)
+                    directSocket?.readData(withTimeout: -1, tag: 0)
                 } catch {
                     clientSocket.disconnectAfterReadingAndWriting()
                 }
             }
         }
     }
-}
-
-public func ==(lhs: Connection, rhs: Connection) -> Bool {
-    return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
 }
