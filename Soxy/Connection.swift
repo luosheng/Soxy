@@ -80,7 +80,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
                 bytes.append(numberOfAuthenticationMethods)
                 bytes.append(contentsOf: authenticationMethods.map() { $0.rawValue })
                 
-                let data = Data(bytes: UnsafePointer<UInt8>(bytes), count: bytes.count)
+                let data = Data(bytes: bytes)
                 return data
             }
         }
@@ -207,7 +207,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
                 let bindPort = targetPort.littleEndian.byteSwapped
                 bytes.append(contentsOf: bindPort.toByteArray())
                 
-                return Data(bytes: UnsafePointer<UInt8>(bytes), count: bytes.count)
+                return Data(bytes: bytes)
             }
         }
     }
