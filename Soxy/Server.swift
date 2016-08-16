@@ -29,7 +29,7 @@ open class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
     }
     
     init(port: UInt16) throws {
-        socket = GCDAsyncSocket(delegate: nil, delegateQueue: DispatchQueue.global(qos: .default))
+        socket = GCDAsyncSocket(delegate: nil, delegateQueue: DispatchQueue.global(qos: .utility))
         socket.delegate = self
         try socket.accept(onPort: port)
     }
