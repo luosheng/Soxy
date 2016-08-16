@@ -48,7 +48,7 @@ open class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
     
     @objc open func socket(_ sock: GCDAsyncSocket, didAcceptNewSocket newSocket: GCDAsyncSocket) {
         let connection = Connection(socket: newSocket)
-        connection.delgate = self
+        connection.delegate = self
         connection.server = self
         connections.insert(connection)
     }

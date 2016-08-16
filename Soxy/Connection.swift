@@ -322,7 +322,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
         }
     }
     
-    var delgate: ConnectionDelegate?
+    var delegate: ConnectionDelegate?
     var server: Proxyable?
     fileprivate let delegateQueue: DispatchQueue
     fileprivate let clientSocket: GCDAsyncSocket
@@ -379,7 +379,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
     
     @objc open func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         disconnect()
-        delgate?.connectionDidClose(self)
+        delegate?.connectionDidClose(self)
     }
 
     @objc open func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
