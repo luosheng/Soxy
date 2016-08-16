@@ -54,7 +54,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
                 throw SocketError.wrongNumberOfAuthenticationMethods
             }
             
-            guard bytes[0] == SoxProxy.SOCKSVersion else {
+            guard bytes[0] == Soxy.SOCKS.version else {
                 throw SocketError.invalidSOCKSVersion
             }
             
@@ -76,7 +76,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
             get {
                 var bytes = [UInt8]()
                 
-                bytes.append(SoxProxy.SOCKSVersion)
+                bytes.append(Soxy.SOCKS.version)
                 bytes.append(numberOfAuthenticationMethods)
                 bytes.append(contentsOf: authenticationMethods.map() { $0.rawValue })
                 
@@ -106,7 +106,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
         
         var data: Data? {
             get {
-                let bytes = [SoxProxy.SOCKSVersion, method.rawValue]
+                let bytes = [Soxy.SOCKS.version, method.rawValue]
                 return Data(bytes: bytes)
             }
         }
@@ -150,7 +150,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
             
             var offset = 0
             
-            guard bytes[offset] == SoxProxy.SOCKSVersion else {
+            guard bytes[offset] == Soxy.SOCKS.version else {
                 throw SocketError.invalidSOCKSVersion
             }
             offset += 1
@@ -193,7 +193,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
         
         var data: Data? {
             get {
-                var bytes: [UInt8] = [SoxProxy.SOCKSVersion, command.rawValue, SoxProxy.SOCKSReserved, addressType.rawValue]
+                var bytes: [UInt8] = [Soxy.SOCKS.version, command.rawValue, Soxy.SOCKS.reserved, addressType.rawValue]
                 
                 switch addressType {
                 case .domainName:
@@ -284,7 +284,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
         
         var data: Data? {
             get {
-                var bytes: [UInt8] = [SoxProxy.SOCKSVersion, field.rawValue, SoxProxy.SOCKSReserved]
+                var bytes: [UInt8] = [Soxy.SOCKS.version, field.rawValue, Soxy.SOCKS.reserved]
                 
                 // If reply field is anything other than Succeed, just reply with
                 // VER, REP, RSV

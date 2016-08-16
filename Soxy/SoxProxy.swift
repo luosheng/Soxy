@@ -10,9 +10,11 @@ import Foundation
 import CocoaAsyncSocket
 import NetworkExtension
 
-struct SoxProxy {
-    static let SOCKSVersion: UInt8 = 0x5
-    static let SOCKSReserved: UInt8 = 0x0
+struct Soxy {
+    struct SOCKS {
+        static let version: UInt8 = 5
+        static let reserved: UInt8 = 0
+    }
 }
 
 extension UInt16 {
