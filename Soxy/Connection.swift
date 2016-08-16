@@ -42,7 +42,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |    1     | 1 to 255 |
  +----+----------+----------+
 */
-    struct MethodSelection: NSDataConvertible, Taggable {
+    struct MethodSelection: DataConvertible, Taggable {
         let numberOfAuthenticationMethods: UInt8
         let authenticationMethods: [AuthenticationMethod]
         
@@ -93,7 +93,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |   1    |
  +----+--------+
 */
-    struct MethodSelectionReply: NSDataConvertible, Taggable {
+    struct MethodSelectionReply: DataConvertible, Taggable {
         let method: AuthenticationMethod
         
         init(data: Data) throws {
@@ -132,7 +132,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
  o  DST.ADDR       desired destination address
  o  DST.PORT desired destination port in network octet order
 */
-    struct Request: NSDataConvertible, Taggable {
+    struct Request: DataConvertible, Taggable {
         enum Command: UInt8 {
             case connect = 0x01
             case bind
@@ -255,7 +255,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
  | 1  |  1  | X'00' |  1   | Variable |    2     |
  +----+-----+-------+------+----------+----------+
 */
-    struct Reply: NSDataConvertible, Taggable {
+    struct Reply: DataConvertible, Taggable {
         enum Field: UInt8 {
             case succeed = 0x00
             case generalSOCKSServerFailure

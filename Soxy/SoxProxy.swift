@@ -23,7 +23,7 @@ extension UInt16 {
     }
 }
 
-protocol NSDataConvertible {
+protocol DataConvertible {
     init(data: Data) throws
     var data: Data? { get }
 }

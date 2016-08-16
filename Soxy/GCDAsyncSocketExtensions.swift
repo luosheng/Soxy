@@ -10,7 +10,7 @@ import Foundation
 import CocoaAsyncSocket
 
 extension GCDAsyncSocket {
-    func writeData<T>(_ t: T) where T: NSDataConvertible, T: Taggable {
+    func writeData<T>(_ t: T) where T: DataConvertible, T: Taggable {
         if let data = t.data {
             self.write(data, withTimeout: -1, tag: t.tag)
         }
