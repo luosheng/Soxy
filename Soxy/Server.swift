@@ -35,13 +35,11 @@ open class Server: GCDAsyncSocketDelegate, ConnectionDelegate, Proxyable {
     }
     
     deinit {
-        self.disconnectAll()
+        disconnectAll()
     }
     
     func disconnectAll() {
-        for connection in connections {
-            connection.disconnect()
-        }
+        connections.forEach { $0.disconnect() }
     }
     
     // MARK: - GCDAsyncSocketDelegate

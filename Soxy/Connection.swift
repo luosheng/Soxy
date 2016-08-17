@@ -303,6 +303,7 @@ open class Connection: GCDAsyncSocketDelegate, Hashable {
                     break
                 }
                 
+                bytes.append(contentsOf: port.littleEndian.toByteArray())
                 let data = NSMutableData(bytes: bytes, length: bytes.count)
                 var networkOctetOrderPort: UInt16 = port.littleEndian
                 data.append(&networkOctetOrderPort, length: 2)
